@@ -7,9 +7,7 @@ import { VisitForm } from "./components/VisitForm";
 import { VisitList } from "./components/VisitList";
 import { BackupTools } from "./components/BackupTools";
 import {
-  filterVisitsByRange,
-  getLastVisit,
-  getNextAppointment,
+  getDashboardStats,
   type VisitRange,
 } from "./utils/visits";
 
@@ -27,38 +25,19 @@ export default function App() {
     saveState(state);
   }, [state]);
 
-  const filteredVisits = useMemo(
-    () => filterVisitsByRange(state.visits, dashboardRange),
+  const dashboardStats = useMemo(
+    () => getDashboardStats(state.visits, dashboardRange),
     [state.visits, dashboardRange],
   );
 
-  const totalsByPet = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const v of filteredVisits) {
-      map.set(v.petId, (map.get(v.petId) ?? 0) + (v.costCLP ?? 0));
-    }
-    return map;
-  }, [filteredVisits]);
-
-  const petsInRangeCount = useMemo(() => {
-    const ids = new Set(filteredVisits.map((v) => v.petId));
-    return ids.size;
-  }, [filteredVisits]);
-
-  const nextAppointment = useMemo(
-    () => getNextAppointment(state.visits),
-    [state.visits],
-  );
-
-  const lastVisit = useMemo(
-    () => getLastVisit(filteredVisits),
-    [filteredVisits],
-  );
-
-  const totalAll = useMemo(
-    () => filteredVisits.reduce((acc, v) => acc + (v.costCLP ?? 0), 0),
-    [filteredVisits],
-  );
+  const {
+    filteredVisits,
+    totalsByPet,
+    petsInRangeCount,
+    totalCost,
+    lastVisit,
+    nextAppointment,
+  } = dashboardStats;
 
   function addPet(pet: Pet) {
     setState((s) => ({ ...s, pets: [pet, ...s.pets] }));
@@ -223,7 +202,7 @@ export default function App() {
               </div>
               <div className="stat">
                 <div className="muted small">Gasto total</div>
-                <div className="strong">{formatCLP(totalAll)}</div>
+                <div className="strong">{formatCLP(totalCost)}</div>
               </div>
             </div>
           </header>

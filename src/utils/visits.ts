@@ -7,6 +7,15 @@ export type NextAppointment = {
   date: string;
 };
 
+export type DashboardStats = {
+  filteredVisits: VetVisit[];
+  totalsByPet: Map<string, number>;
+  petsInRangeCount: number;
+  totalCost: number;
+  lastVisit: VetVisit | null;
+  nextAppointment: NextAppointment | null;
+};
+
 function toDayTimestamp(value: string): number | null {
   if (!value) return null;
   const parsed = Date.parse(`${value}T00:00:00`);
@@ -71,4 +80,32 @@ export function getLastVisit(visits: VetVisit[]): VetVisit | null {
   }
 
   return best;
+}
+
+export function getDashboardStats(
+  visits: VetVisit[],
+  range: VisitRange,
+): DashboardStats {
+  const filteredVisits = filterVisitsByRange(visits, range);
+  const totalsByPet = new Map<string, number>();
+  const petIds = new Set<string>();
+  let totalCost = 0;
+
+  for (const visit of filteredVisits) {
+    petIds.add(visit.petId);
+    totalsByPet.set(
+      visit.petId,
+      (totalsByPet.get(visit.petId) ?? 0) + (visit.costCLP ?? 0),
+    );
+    totalCost += visit.costCLP ?? 0;
+  }
+
+  return {
+    filteredVisits,
+    totalsByPet,
+    petsInRangeCount: petIds.size,
+    totalCost,
+    lastVisit: getLastVisit(filteredVisits),
+    nextAppointment: getNextAppointment(visits),
+  };
 }
