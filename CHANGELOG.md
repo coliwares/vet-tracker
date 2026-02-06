@@ -25,6 +25,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - "Nueva visita" CTA visible in Visitas and Dashboard history.
 - Delete perrita action moved into a menu with modal confirmation.
 - "Borrar todo" now requires typing "BORRAR" to confirm.
+- Improved accessibility and UI consistency (ARIA, focus-visible, spacing, and interaction states).
 
 ### Tests
 - Unit tests for visit filters, stats utilities, formatAge, and currency helpers.

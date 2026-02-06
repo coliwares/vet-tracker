@@ -268,6 +268,15 @@ select:focus {
 	box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.22);
 }
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+	outline: 3px solid rgba(31, 127, 117, 0.6);
+	outline-offset: 2px;
+}
+
 input.error,
 select.error {
 	border-color: var(--danger);
@@ -301,7 +310,7 @@ select:hover {
 	background: #e9f7f3;
 	border: 1px solid rgba(42, 157, 143, 0.35);
 	color: #1f7f75;
-	padding: 10px 12px;
+	padding: 8px 16px;
 	border-radius: 12px;
 	font-weight: 600;
 	margin-bottom: 12px;
@@ -309,22 +318,22 @@ select:hover {
 
 .backup-preview {
 	margin-top: 14px;
-	padding: 12px 14px;
+	padding: 16px;
 	border-radius: 16px;
 	border: 1px dashed rgba(42, 157, 143, 0.35);
 	background: #f3faf7;
 	display: grid;
-	gap: 10px;
+	gap: 8px;
 }
 
 .merge-summary {
 	margin-top: 12px;
-	padding: 12px 14px;
+	padding: 16px;
 	border-radius: 16px;
 	border: 1px solid rgba(42, 157, 143, 0.25);
 	background: #eef8f4;
 	display: grid;
-	gap: 6px;
+	gap: 8px;
 }
 
 .dialog-backdrop {
@@ -342,10 +351,10 @@ select:hover {
 	border-radius: 18px;
 	border: 1px solid var(--border);
 	box-shadow: var(--shadow);
-	padding: 18px;
+	padding: 16px;
 	width: min(420px, 100%);
 	display: grid;
-	gap: 12px;
+	gap: 8px;
 }
 
 .dialog h3 {
@@ -361,9 +370,9 @@ select:hover {
 	border: 1px solid var(--border);
 	box-shadow: var(--shadow);
 	border-radius: 14px;
-	padding: 12px 14px;
+	padding: 16px;
 	display: flex;
-	gap: 12px;
+	gap: 8px;
 	align-items: center;
 	flex-wrap: wrap;
 	z-index: 40;
@@ -406,10 +415,19 @@ select:hover {
 	border-color: rgba(30, 42, 42, 0.2);
 }
 
+.chip-btn:active,
+.chip-toggle:active,
+.nav-btn:active,
+.range-btn:active,
+.btn:active,
+.menu-trigger:active {
+	transform: translateY(0);
+}
+
 .details {
 	border: 1px dashed rgba(30, 42, 42, 0.12);
 	border-radius: 14px;
-	padding: 10px 12px 12px;
+	padding: 8px 16px 16px;
 	background: #fbfdfc;
 }
 
@@ -746,7 +764,7 @@ select:hover {
 .visit-details {
 	border: 1px dashed rgba(30, 42, 42, 0.12);
 	border-radius: 14px;
-	padding: 10px 12px;
+	padding: 8px 16px;
 	background: #fbfdfc;
 }
 
@@ -762,9 +780,9 @@ select:hover {
 
 .visit-details-grid {
 	display: grid;
-	gap: 10px;
+	gap: 8px;
 	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-	margin-top: 10px;
+	margin-top: 8px;
 }
 
 .visit-actions {

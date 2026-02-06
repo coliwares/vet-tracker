@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 
 type Props = {
   open: boolean;
@@ -44,22 +44,37 @@ function DialogContent({
   onCancel,
 }: ContentProps) {
   const [typed, setTyped] = useState("");
+  const titleId = useId();
+  const descriptionId = useId();
+  const inputId = useId();
   const needsTyping = Boolean(requireTyping);
   const canConfirm = needsTyping ? typed === requireTyping : true;
 
   return (
-    <div className="dialog-backdrop" role="dialog" aria-modal="true">
+    <div
+      className="dialog-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={description ? descriptionId : undefined}
+    >
       <div className="dialog">
-        <h3>{title}</h3>
-        {description ? <p className="muted small">{description}</p> : null}
+        <h3 id={titleId}>{title}</h3>
+        {description ? (
+          <p id={descriptionId} className="muted small">
+            {description}
+          </p>
+        ) : null}
 
         {needsTyping ? (
-          <label>
+          <label htmlFor={inputId}>
             Escribe "{requireTyping}" para confirmar
             <input
+              id={inputId}
               value={typed}
               onChange={(e) => setTyped(e.target.value)}
               placeholder={requireTyping}
+              autoComplete="off"
             />
           </label>
         ) : null}

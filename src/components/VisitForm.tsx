@@ -136,7 +136,11 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
     <section className="card">
       <h2>🩺 Nueva visita</h2>
 
-      {toast ? <div className="toast">{toast}</div> : null}
+      {toast ? (
+        <div className="toast" role="status" aria-live="polite">
+          {toast}
+        </div>
+      ) : null}
 
       {pets.length === 0 ? (
         <div className="empty-state">
@@ -200,6 +204,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
                   key={template}
                   type="button"
                   className="chip-btn"
+                  aria-pressed={reason === template}
                   onClick={() => {
                     setReason(template);
                     setReasonTouched(true);

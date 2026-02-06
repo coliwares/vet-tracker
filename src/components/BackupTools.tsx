@@ -111,7 +111,7 @@ export function BackupTools({ state, onImport }: Props) {
       ) : null}
 
       {mergeSummary ? (
-        <div className="merge-summary">
+        <div className="merge-summary" role="status" aria-live="polite">
           <div className="strong">Resultado de la combinacion</div>
           <div className="muted small">
             Perritas: {mergeSummary.pets.kept} mantenidas, {" "}

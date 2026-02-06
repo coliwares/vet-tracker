@@ -454,7 +454,7 @@ export default function App() {
         backups si lo necesitas.
       </footer>
       {undoVisit ? (
-        <div className="undo-toast">
+        <div className="undo-toast" role="status" aria-live="polite">
           <span>
             Visita eliminada. Puedes deshacer durante unos segundos.
           </span>

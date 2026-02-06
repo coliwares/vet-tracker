@@ -133,6 +133,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
                     className="menu-trigger"
                     type="button"
                     aria-label="Opciones"
+                    aria-haspopup="menu"
                     aria-expanded={menuOpenId === p.id}
                     onClick={() =>
                       setMenuOpenId((prev) => (prev === p.id ? null : p.id))

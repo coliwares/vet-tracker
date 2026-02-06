@@ -61,12 +61,13 @@ export function VisitList({
       <h2>📚 Historial</h2>
 
       <div className="visit-filters">
-        <div>
+        <div role="group" aria-label="Filtro por perrita">
           <div className="muted small">Perrita</div>
           <div className="filter-chips">
             <button
               type="button"
               className={`chip-toggle ${filterPetId === "" ? "active" : ""}`}
+              aria-pressed={filterPetId === ""}
               onClick={() => onChangePetId("")}
             >
               Todas
@@ -78,6 +79,7 @@ export function VisitList({
                 className={`chip-toggle ${
                   filterPetId === p.id ? "active" : ""
                 }`}
+                aria-pressed={filterPetId === p.id}
                 onClick={() => onChangePetId(p.id)}
               >
                 {p.name}
@@ -86,7 +88,7 @@ export function VisitList({
           </div>
         </div>
 
-        <div>
+        <div role="group" aria-label="Orden de resultados">
           <div className="muted small">Orden</div>
           <div className="filter-chips">
             {(
@@ -102,6 +104,7 @@ export function VisitList({
                 className={`chip-toggle ${
                   sortKey === item.id ? "active" : ""
                 }`}
+                aria-pressed={sortKey === item.id}
                 onClick={() => onChangeSort(item.id)}
               >
                 {item.label}
@@ -110,7 +113,7 @@ export function VisitList({
           </div>
         </div>
 
-        <div>
+        <div role="group" aria-label="Rango de fechas">
           <div className="muted small">Rango</div>
           <div className="filter-chips">
             {(
@@ -127,6 +130,7 @@ export function VisitList({
                 className={`chip-toggle ${
                   range === item.id ? "active" : ""
                 }`}
+                aria-pressed={range === item.id}
                 onClick={() => onChangeRange(item.id)}
               >
                 {item.label}
