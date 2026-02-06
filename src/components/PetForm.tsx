@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import type { Pet } from "../types";
 import { newId } from "../storage";
 import { formatAge } from "../utils/formatAge";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 type Props = {
   pets: Pet[];
@@ -17,6 +18,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [birthDate, setBirthDate] = useState("");
   const [notes, setNotes] = useState("");
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Pet | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
   const canAdd = nameValid;
@@ -42,13 +44,11 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     setNotes("");
   }
 
-  function handleDelete(petId: string, petName: string) {
-    const ok = confirm(
-      `¿Eliminar ${petName}? También se eliminarán sus visitas asociadas.`,
-    );
-    if (!ok) return;
-    onDelete(petId);
+  function handleDeleteConfirm() {
+    if (!pendingDelete) return;
+    onDelete(pendingDelete.id);
     setMenuOpenId(null);
+    setPendingDelete(null);
   }
 
   return (
@@ -145,7 +145,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
                       <button
                         className="menu-item danger"
                         type="button"
-                        onClick={() => handleDelete(p.id, p.name)}
+                        onClick={() => setPendingDelete(p)}
                       >
                         Eliminar perrita
                       </button>
@@ -183,6 +183,18 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title={
+          pendingDelete
+            ? `Eliminar ${pendingDelete.name}`
+            : "Eliminar perrita"
+        }
+        description="Esto eliminará la perrita y todas sus visitas asociadas."
+        confirmText="Eliminar"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDelete(null)}
+      />
     </section>
   );
 }

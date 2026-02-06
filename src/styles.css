@@ -327,6 +327,48 @@ select:hover {
 	gap: 6px;
 }
 
+.dialog-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(12, 24, 24, 0.45);
+	display: grid;
+	place-items: center;
+	padding: 20px;
+	z-index: 50;
+}
+
+.dialog {
+	background: #ffffff;
+	border-radius: 18px;
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow);
+	padding: 18px;
+	width: min(420px, 100%);
+	display: grid;
+	gap: 12px;
+}
+
+.dialog h3 {
+	margin: 0;
+}
+
+.undo-toast {
+	position: fixed;
+	left: 50%;
+	bottom: 24px;
+	transform: translateX(-50%);
+	background: #ffffff;
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow);
+	border-radius: 14px;
+	padding: 12px 14px;
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	flex-wrap: wrap;
+	z-index: 40;
+}
+
 .col-span {
 	grid-column: 1 / -1;
 }

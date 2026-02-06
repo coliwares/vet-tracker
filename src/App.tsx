@@ -6,6 +6,7 @@ import { PetForm } from "./components/PetForm";
 import { VisitForm } from "./components/VisitForm";
 import { VisitList } from "./components/VisitList";
 import { BackupTools } from "./components/BackupTools";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import {
   getDashboardStats,
   type VisitRange,
@@ -22,6 +23,10 @@ export default function App() {
   const [dashboardRange, setDashboardRange] = useState<VisitRange>("90d");
   const [visitRange, setVisitRange] = useState<VisitRange>("all");
   const [visitSort, setVisitSort] = useState<SortKey>("newest");
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [undoVisit, setUndoVisit] = useState<
+    { visit: VetVisit; timeoutId: number } | null
+  >(null);
   const visitFormRef = useRef<HTMLDivElement | null>(null);
   const visitListRef = useRef<HTMLDivElement | null>(null);
 
@@ -64,10 +69,19 @@ export default function App() {
   }
 
   function deleteVisit(visitId: string) {
+    const visit = state.visits.find((v) => v.id === visitId);
+    if (!visit) return;
     setState((s) => ({
       ...s,
       visits: s.visits.filter((v) => v.id !== visitId),
     }));
+    setUndoVisit((prev) => {
+      if (prev) window.clearTimeout(prev.timeoutId);
+      const timeoutId = window.setTimeout(() => {
+        setUndoVisit(null);
+      }, 6500);
+      return { visit, timeoutId };
+    });
   }
 
   function importState(next: AppState) {
@@ -77,13 +91,17 @@ export default function App() {
   }
 
   function resetAll() {
-    const ok = confirm(
-      "Esto borrará TODO (perritas y visitas) en este navegador. ¿Seguro?",
-    );
-    if (!ok) return;
     setState(emptyState);
     setFilterPetId("");
     setSearch("");
+    setShowResetDialog(false);
+  }
+
+  function undoDeleteVisit() {
+    if (!undoVisit) return;
+    window.clearTimeout(undoVisit.timeoutId);
+    setState((s) => ({ ...s, visits: [undoVisit.visit, ...s.visits] }));
+    setUndoVisit(null);
   }
 
   function formatCLP(n?: number) {
@@ -416,7 +434,10 @@ export default function App() {
 
               <section className="card">
                 <h2>🧹 Mantenimiento</h2>
-                <button className="btn danger" onClick={resetAll}>
+                <button
+                  className="btn danger"
+                  onClick={() => setShowResetDialog(true)}
+                >
                   Borrar todo
                 </button>
                 <p className="muted small">
@@ -432,6 +453,25 @@ export default function App() {
         Hecho para registrar visitas vet. Persistencia: LocalStorage. Exporta
         backups si lo necesitas.
       </footer>
+      {undoVisit ? (
+        <div className="undo-toast">
+          <span>
+            Visita eliminada. Puedes deshacer durante unos segundos.
+          </span>
+          <button className="btn secondary" type="button" onClick={undoDeleteVisit}>
+            Deshacer
+          </button>
+        </div>
+      ) : null}
+      <ConfirmDialog
+        open={showResetDialog}
+        title="Borrar todo"
+        description="Esto eliminará perritas y visitas en este navegador. Esta acción no se puede deshacer."
+        confirmText="Borrar todo"
+        requireTyping="BORRAR"
+        onConfirm={resetAll}
+        onCancel={() => setShowResetDialog(false)}
+      />
     </div>
   );
 }
