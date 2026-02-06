@@ -71,10 +71,6 @@ export default function App() {
   }
 
   function importState(next: AppState) {
-    const ok = confirm(
-      "Esto reemplazará tus datos actuales por los del backup. ¿Continuar?",
-    );
-    if (!ok) return;
     setState(next);
     setFilterPetId("");
     setSearch("");

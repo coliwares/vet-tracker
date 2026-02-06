@@ -21,3 +21,6 @@ All notable changes to this project will be documented in this file.
 - Added toast confirmation and quick "Agregar otra visita" action.
 - Redesigned Historial with card layout, expandable details, and chip filters.
 - Added search/sort/filter utilities for visits with unit tests.
+- Added backup import preview with replace/merge options.
+- Added dedupe and merge utilities with unit tests.
+- Added merge summary after backup combine.

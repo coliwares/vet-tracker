@@ -307,6 +307,26 @@ select:hover {
 	margin-bottom: 12px;
 }
 
+.backup-preview {
+	margin-top: 14px;
+	padding: 12px 14px;
+	border-radius: 16px;
+	border: 1px dashed rgba(42, 157, 143, 0.35);
+	background: #f3faf7;
+	display: grid;
+	gap: 10px;
+}
+
+.merge-summary {
+	margin-top: 12px;
+	padding: 12px 14px;
+	border-radius: 16px;
+	border: 1px solid rgba(42, 157, 143, 0.25);
+	background: #eef8f4;
+	display: grid;
+	gap: 6px;
+}
+
 .col-span {
 	grid-column: 1 / -1;
 }
