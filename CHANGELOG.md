@@ -8,6 +8,8 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - PATCH: bug fixes and small improvements
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-02-06
 ### Added
 - Top navigation with Dashboard, Visitas, Perritas, and Ajustes sections.
 - Dashboard range filter (30/90 days, year, all) and summary cards.
