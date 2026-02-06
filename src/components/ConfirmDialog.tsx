@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type Props = {
   open: boolean;
@@ -19,14 +19,31 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: Props) {
-  const [typed, setTyped] = useState("");
-
-  useEffect(() => {
-    if (open) setTyped("");
-  }, [open]);
-
   if (!open) return null;
 
+  return (
+    <DialogContent
+      title={title}
+      description={description}
+      confirmText={confirmText}
+      requireTyping={requireTyping}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  );
+}
+
+type ContentProps = Omit<Props, "open">;
+
+function DialogContent({
+  title,
+  description,
+  confirmText,
+  requireTyping,
+  onConfirm,
+  onCancel,
+}: ContentProps) {
+  const [typed, setTyped] = useState("");
   const needsTyping = Boolean(requireTyping);
   const canConfirm = needsTyping ? typed === requireTyping : true;
 
