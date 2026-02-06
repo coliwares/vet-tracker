@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./styles.css";
 import type { AppState, Pet, VetVisit } from "./types";
 import { emptyState, loadState, saveState } from "./storage";
@@ -11,6 +11,10 @@ export default function App() {
   const [state, setState] = useState<AppState>(() => loadState());
   const [filterPetId, setFilterPetId] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [activeSection, setActiveSection] = useState<
+    "dashboard" | "visits" | "pets" | "settings"
+  >("dashboard");
+  const visitFormRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     saveState(state);
@@ -95,74 +99,101 @@ export default function App() {
     }
   }
 
+  function handleNewVisit() {
+    setActiveSection("visits");
+    requestAnimationFrame(() => {
+      visitFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
   return (
     <div className="app">
-      <header className="header">
-        <div>
-          <h1>🐾 Vet Visits Tracker</h1>
-          <p className="muted">
-            Registro simple de visitas al veterinario para tus perritas
-            (offline).
-          </p>
-        </div>
-
-        <div className="stats">
-          <div className="stat">
-            <div className="muted small">Visitas</div>
-            <div className="strong">{state.visits.length}</div>
+      <div className="topbar">
+        <div className="brand">
+          <div className="logo" aria-hidden="true">
+            🐾
           </div>
-          <div className="stat">
-            <div className="muted small">Perritas</div>
-            <div className="strong">{state.pets.length}</div>
-          </div>
-          <div className="stat">
-            <div className="muted small">Gasto total</div>
-            <div className="strong">{formatCLP(totalAll)}</div>
+          <div>
+            <div className="brand-title">Vet Visits Tracker</div>
+            <div className="muted small">
+              Registro simple de visitas al veterinario (offline).
+            </div>
           </div>
         </div>
-      </header>
 
-      {state.pets.length > 0 ? (
-        <section className="card">
-          <h2>📊 Gasto por perrita</h2>
-          <div className="chips">
-            {state.pets.map((p) => (
-              <div key={p.id} className="chip">
-                <span className="chip-icon" aria-hidden="true">
-                  {p.name.slice(0, 1).toUpperCase()}
-                </span>
-                <span className="strong">{p.name}</span>
-                <span className="chip-amount">
-                  {formatCLP(totalsByPet.get(p.id) ?? 0)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      <div className="layout">
-        <div className="col">
-          <PetForm pets={state.pets} onAdd={addPet} onDelete={deletePet} />
-          <VisitForm
-            pets={state.pets}
-            defaultPetId={filterPetId || state.pets[0]?.id}
-            onAdd={addVisit}
-          />
-          <BackupTools state={state} onImport={importState} />
-
-          <section className="card">
-            <h2>🧹 Mantenimiento</h2>
-            <button className="btn danger" onClick={resetAll}>
-              Borrar todo
+        <nav className="nav" aria-label="Secciones principales">
+          {(
+            [
+              { id: "dashboard", label: "Dashboard" },
+              { id: "visits", label: "Visitas" },
+              { id: "pets", label: "Perritas" },
+              { id: "settings", label: "Ajustes" },
+            ] as const
+          ).map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`nav-btn ${
+                activeSection === item.id ? "active" : ""
+              }`}
+              onClick={() => setActiveSection(item.id)}
+              aria-current={activeSection === item.id ? "page" : undefined}
+            >
+              {item.label}
             </button>
-            <p className="muted small">
-              Esto solo afecta este navegador (LocalStorage).
-            </p>
-          </section>
-        </div>
+          ))}
+        </nav>
+      </div>
 
-        <div className="col">
+      {activeSection === "dashboard" ? (
+        <section className="section">
+          <header className="header">
+            <div>
+              <h1>🐾 Vet Visits Tracker</h1>
+              <p className="muted">
+                Registro simple de visitas al veterinario para tus perritas
+                (offline).
+              </p>
+            </div>
+
+            <div className="stats">
+              <div className="stat">
+                <div className="muted small">Visitas</div>
+                <div className="strong">{state.visits.length}</div>
+              </div>
+              <div className="stat">
+                <div className="muted small">Perritas</div>
+                <div className="strong">{state.pets.length}</div>
+              </div>
+              <div className="stat">
+                <div className="muted small">Gasto total</div>
+                <div className="strong">{formatCLP(totalAll)}</div>
+              </div>
+            </div>
+          </header>
+
+          {state.pets.length > 0 ? (
+            <section className="card">
+              <h2>📊 Gasto por perrita</h2>
+              <div className="chips">
+                {state.pets.map((p) => (
+                  <div key={p.id} className="chip">
+                    <span className="chip-icon" aria-hidden="true">
+                      {p.name.slice(0, 1).toUpperCase()}
+                    </span>
+                    <span className="strong">{p.name}</span>
+                    <span className="chip-amount">
+                      {formatCLP(totalsByPet.get(p.id) ?? 0)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
           <VisitList
             pets={state.pets}
             visits={state.visits}
@@ -171,9 +202,99 @@ export default function App() {
             onChangePetId={setFilterPetId}
             onChangeSearch={setSearch}
             onDelete={deleteVisit}
+            onNewVisit={handleNewVisit}
           />
-        </div>
-      </div>
+        </section>
+      ) : null}
+
+      {activeSection === "visits" ? (
+        <section className="section">
+          <div className="section-header">
+            <div>
+              <h2>Visitas</h2>
+              <p className="muted small">
+                Registra nuevas visitas y consulta el historial filtrado.
+              </p>
+            </div>
+            <div className="section-actions">
+              <button className="btn" type="button" onClick={handleNewVisit}>
+                Nueva visita
+              </button>
+            </div>
+          </div>
+
+          <div className="layout">
+            <div className="col" ref={visitFormRef}>
+              <VisitForm
+                pets={state.pets}
+                defaultPetId={filterPetId || state.pets[0]?.id}
+                onAdd={addVisit}
+              />
+            </div>
+
+            <div className="col">
+              <VisitList
+                pets={state.pets}
+                visits={state.visits}
+                filterPetId={filterPetId}
+                search={search}
+                onChangePetId={setFilterPetId}
+                onChangeSearch={setSearch}
+                onDelete={deleteVisit}
+                onNewVisit={handleNewVisit}
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {activeSection === "pets" ? (
+        <section className="section">
+          <div className="section-header">
+            <div>
+              <h2>Perritas</h2>
+              <p className="muted small">
+                Administra perfiles, notas y datos base.
+              </p>
+            </div>
+          </div>
+
+          <div className="layout single">
+            <div className="col">
+              <PetForm pets={state.pets} onAdd={addPet} onDelete={deletePet} />
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {activeSection === "settings" ? (
+        <section className="section">
+          <div className="section-header">
+            <div>
+              <h2>Ajustes</h2>
+              <p className="muted small">
+                Respaldo y mantenimiento de tus datos locales.
+              </p>
+            </div>
+          </div>
+
+          <div className="layout single">
+            <div className="col">
+              <BackupTools state={state} onImport={importState} />
+
+              <section className="card">
+                <h2>🧹 Mantenimiento</h2>
+                <button className="btn danger" onClick={resetAll}>
+                  Borrar todo
+                </button>
+                <p className="muted small">
+                  Esto solo afecta este navegador (LocalStorage).
+                </p>
+              </section>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <footer className="footer muted small">
         Hecho para registrar visitas vet. Persistencia: LocalStorage. Exporta

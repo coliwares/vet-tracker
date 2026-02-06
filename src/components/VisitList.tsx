@@ -9,6 +9,7 @@ type Props = {
   onChangePetId: (petId: string) => void;
   onChangeSearch: (q: string) => void;
   onDelete: (visitId: string) => void;
+  onNewVisit?: () => void;
 };
 
 function formatCLP(n?: number) {
@@ -32,6 +33,7 @@ export function VisitList({
   onChangePetId,
   onChangeSearch,
   onDelete,
+  onNewVisit,
 }: Props) {
   const petById = useMemo(() => new Map(pets.map((p) => [p.id, p])), [pets]);
 
@@ -91,6 +93,12 @@ export function VisitList({
             placeholder="vacuna, clínica, diagnóstico…"
           />
         </label>
+
+        {onNewVisit ? (
+          <button className="btn" type="button" onClick={onNewVisit}>
+            Nueva visita
+          </button>
+        ) : null}
 
         <div className="pill">
           Total filtrado: <b>{formatCLP(total)}</b>
