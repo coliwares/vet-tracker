@@ -73,6 +73,44 @@
 	margin-bottom: 18px;
 }
 
+.dashboard-controls {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.range-filter {
+	display: inline-flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.range-btn {
+	appearance: none;
+	border: 1px solid rgba(30, 42, 42, 0.12);
+	background: #ffffff;
+	color: inherit;
+	border-radius: 999px;
+	padding: 6px 12px;
+	font-weight: 600;
+	font-size: 13px;
+	cursor: pointer;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.range-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-soft);
+	border-color: rgba(30, 42, 42, 0.2);
+}
+
+.range-btn.active {
+	background: #1f7f75;
+	color: #ffffff;
+	border-color: transparent;
+}
+
 .section-header {
 	display: flex;
 	justify-content: space-between;
@@ -175,6 +213,11 @@
 	box-shadow: var(--shadow);
 	position: relative;
 	overflow: hidden;
+}
+
+.card-body {
+	display: grid;
+	gap: 6px;
 }
 
 .card h2 {
@@ -431,6 +474,12 @@ select:hover {
 	display: flex;
 	gap: 10px;
 	flex-wrap: wrap;
+}
+
+.dashboard-cards {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .chip {

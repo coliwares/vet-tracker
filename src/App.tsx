@@ -6,6 +6,12 @@ import { PetForm } from "./components/PetForm";
 import { VisitForm } from "./components/VisitForm";
 import { VisitList } from "./components/VisitList";
 import { BackupTools } from "./components/BackupTools";
+import {
+  filterVisitsByRange,
+  getLastVisit,
+  getNextAppointment,
+  type VisitRange,
+} from "./utils/visits";
 
 export default function App() {
   const [state, setState] = useState<AppState>(() => loadState());
@@ -14,23 +20,44 @@ export default function App() {
   const [activeSection, setActiveSection] = useState<
     "dashboard" | "visits" | "pets" | "settings"
   >("dashboard");
+  const [dashboardRange, setDashboardRange] = useState<VisitRange>("90d");
   const visitFormRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     saveState(state);
   }, [state]);
 
+  const filteredVisits = useMemo(
+    () => filterVisitsByRange(state.visits, dashboardRange),
+    [state.visits, dashboardRange],
+  );
+
   const totalsByPet = useMemo(() => {
     const map = new Map<string, number>();
-    for (const v of state.visits) {
+    for (const v of filteredVisits) {
       map.set(v.petId, (map.get(v.petId) ?? 0) + (v.costCLP ?? 0));
     }
     return map;
-  }, [state.visits]);
+  }, [filteredVisits]);
+
+  const petsInRangeCount = useMemo(() => {
+    const ids = new Set(filteredVisits.map((v) => v.petId));
+    return ids.size;
+  }, [filteredVisits]);
+
+  const nextAppointment = useMemo(
+    () => getNextAppointment(state.visits),
+    [state.visits],
+  );
+
+  const lastVisit = useMemo(
+    () => getLastVisit(filteredVisits),
+    [filteredVisits],
+  );
 
   const totalAll = useMemo(
-    () => state.visits.reduce((acc, v) => acc + (v.costCLP ?? 0), 0),
-    [state.visits],
+    () => filteredVisits.reduce((acc, v) => acc + (v.costCLP ?? 0), 0),
+    [filteredVisits],
   );
 
   function addPet(pet: Pet) {
@@ -87,7 +114,8 @@ export default function App() {
     setSearch("");
   }
 
-  function formatCLP(n: number) {
+  function formatCLP(n?: number) {
+    if (n === undefined || n === null) return "—";
     try {
       return new Intl.NumberFormat("es-CL", {
         style: "currency",
@@ -150,6 +178,31 @@ export default function App() {
 
       {activeSection === "dashboard" ? (
         <section className="section">
+          <div className="dashboard-controls">
+            <div className="muted small">Rango</div>
+            <div className="range-filter" role="group" aria-label="Rango">
+              {(
+                [
+                  { id: "30d", label: "Últimos 30" },
+                  { id: "90d", label: "Últimos 90" },
+                  { id: "year", label: "Año" },
+                  { id: "all", label: "Todo" },
+                ] as const
+              ).map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`range-btn ${
+                    dashboardRange === item.id ? "active" : ""
+                  }`}
+                  onClick={() => setDashboardRange(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <header className="header">
             <div>
               <h1>🐾 Vet Visits Tracker</h1>
@@ -162,11 +215,11 @@ export default function App() {
             <div className="stats">
               <div className="stat">
                 <div className="muted small">Visitas</div>
-                <div className="strong">{state.visits.length}</div>
+                <div className="strong">{filteredVisits.length}</div>
               </div>
               <div className="stat">
                 <div className="muted small">Perritas</div>
-                <div className="strong">{state.pets.length}</div>
+                <div className="strong">{petsInRangeCount}</div>
               </div>
               <div className="stat">
                 <div className="muted small">Gasto total</div>
@@ -175,24 +228,92 @@ export default function App() {
             </div>
           </header>
 
-          {state.pets.length > 0 ? (
+          <div className="dashboard-cards">
+            <section className="card">
+              <h2>📅 Próxima cita</h2>
+              {nextAppointment ? (
+                <div className="card-body">
+                  <div className="strong">{nextAppointment.date}</div>
+                  <div className="muted small">
+                    {state.pets.find((p) => p.id === nextAppointment.visit.petId)
+                      ?.name ?? "Perrita"}
+                    {nextAppointment.visit.clinic
+                      ? ` · ${nextAppointment.visit.clinic}`
+                      : ""}
+                  </div>
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-title">Sin próximas citas</div>
+                  <div className="muted small">
+                    Agrega una nueva visita y programa el control.
+                  </div>
+                  <button className="btn" onClick={handleNewVisit}>
+                    Nueva visita
+                  </button>
+                </div>
+              )}
+            </section>
+
+            <section className="card">
+              <h2>🧾 Última visita registrada</h2>
+              {lastVisit ? (
+                <div className="card-body">
+                  <div className="strong">{lastVisit.date}</div>
+                  <div className="muted small">{lastVisit.reason}</div>
+                  <div className="chip-amount">
+                    {formatCLP(lastVisit.costCLP)}
+                  </div>
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-title">Sin visitas en este rango</div>
+                  <div className="muted small">
+                    Prueba con otro rango o registra una nueva visita.
+                  </div>
+                  <button className="btn" onClick={handleNewVisit}>
+                    Nueva visita
+                  </button>
+                </div>
+              )}
+            </section>
+          </div>
+
+          {filteredVisits.length > 0 ? (
             <section className="card">
               <h2>📊 Gasto por perrita</h2>
               <div className="chips">
-                {state.pets.map((p) => (
-                  <div key={p.id} className="chip">
-                    <span className="chip-icon" aria-hidden="true">
-                      {p.name.slice(0, 1).toUpperCase()}
-                    </span>
-                    <span className="strong">{p.name}</span>
-                    <span className="chip-amount">
-                      {formatCLP(totalsByPet.get(p.id) ?? 0)}
-                    </span>
-                  </div>
-                ))}
+                {state.pets.map((p) => {
+                  const amount = totalsByPet.get(p.id);
+                  if (amount === undefined) return null;
+                  return (
+                    <div key={p.id} className="chip">
+                      <span className="chip-icon" aria-hidden="true">
+                        {p.name.slice(0, 1).toUpperCase()}
+                      </span>
+                      <span className="strong">{p.name}</span>
+                      <span className="chip-amount">
+                        {formatCLP(amount ?? 0)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </section>
-          ) : null}
+          ) : (
+            <section className="card">
+              <h2>📊 Gasto por perrita</h2>
+              <div className="empty-state">
+                <div className="empty-title">Sin datos para este rango</div>
+                <div className="muted small">
+                  Registra una visita o cambia el filtro.
+                </div>
+                <button className="btn" onClick={handleNewVisit}>
+                  Nueva visita
+                </button>
+              </div>
+            </section>
+          )}
 
           <VisitList
             pets={state.pets}
