@@ -16,3 +16,6 @@ All notable changes to this project will be documented in this file.
 - Added "Ver visitas" CTA to open Visitas filtered by perrita.
 - Moved delete action into a menu with confirmation.
 - Added formatAge utility and unit tests.
+- Refactored Nueva visita form with reordered fields, reason chips, and details section.
+- Added formatted CLP cost input with parsing utilities and tests.
+- Added toast confirmation and quick "Agregar otra visita" action.
