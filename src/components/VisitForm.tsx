@@ -21,15 +21,27 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
   const [costCLP, setCostCLP] = useState<string>("");
   const [nextVisitDate, setNextVisitDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [petTouched, setPetTouched] = useState(false);
+  const [dateTouched, setDateTouched] = useState(false);
+  const [reasonTouched, setReasonTouched] = useState(false);
+
+  const petValid = Boolean(petId);
+  const dateValid = Boolean(date);
+  const reasonValid = reason.trim().length >= 3;
 
   const canAdd = useMemo(
-    () => pets.length > 0 && petId && reason.trim().length >= 3 && date,
-    [pets.length, petId, reason, date],
+    () => pets.length > 0 && petValid && reasonValid && dateValid,
+    [pets.length, petValid, reasonValid, dateValid],
   );
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canAdd) return;
+    if (!canAdd) {
+      setPetTouched(true);
+      setDateTouched(true);
+      setReasonTouched(true);
+      return;
+    }
 
     const nowIso = new Date().toISOString();
     const parsedCost = costCLP.trim()
@@ -66,20 +78,31 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
       <h2>🩺 Nueva visita</h2>
 
       {pets.length === 0 ? (
-        <p className="muted">
-          Primero agrega al menos una perrita para registrar visitas.
-        </p>
+        <div className="empty-state">
+          <div className="empty-title">Primero registra una perrita</div>
+          <div className="muted small">
+            Luego podrás anotar vacunas, controles y tratamientos.
+          </div>
+        </div>
       ) : (
         <form onSubmit={submit} className="grid">
           <label>
             Perrita *
-            <select value={petId} onChange={(e) => setPetId(e.target.value)}>
+            <select
+              value={petId}
+              onChange={(e) => setPetId(e.target.value)}
+              onBlur={() => setPetTouched(true)}
+              className={petTouched ? (petValid ? "success" : "error") : ""}
+            >
               {pets.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
                 </option>
               ))}
             </select>
+            {petTouched && !petValid ? (
+              <span className="field-helper error">Selecciona una perrita.</span>
+            ) : null}
           </label>
 
           <label>
@@ -88,7 +111,12 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              onBlur={() => setDateTouched(true)}
+              className={dateTouched ? (dateValid ? "success" : "error") : ""}
             />
+            {dateTouched && !dateValid ? (
+              <span className="field-helper error">Selecciona una fecha.</span>
+            ) : null}
           </label>
 
           <label>
@@ -98,6 +126,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => setClinic(e.target.value)}
               placeholder="Ej: Vet Los Dominicos"
             />
+            <span className="field-helper">
+              Opcional: agrega el nombre de la clínica.
+            </span>
           </label>
 
           <label>
@@ -107,6 +138,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => setVet(e.target.value)}
               placeholder="Nombre"
             />
+            <span className="field-helper">
+              Opcional: nombre de la persona que atendió.
+            </span>
           </label>
 
           <label className="col-span">
@@ -114,8 +148,15 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
             <input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
+              onBlur={() => setReasonTouched(true)}
+              className={reasonTouched ? (reasonValid ? "success" : "error") : ""}
               placeholder="Vacuna, control, vómitos, piel, etc."
             />
+            {reasonTouched && !reasonValid ? (
+              <span className="field-helper error">
+                Describe el motivo en al menos 3 caracteres.
+              </span>
+            ) : null}
           </label>
 
           <label className="col-span">
@@ -125,6 +166,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => setDiagnosis(e.target.value)}
               placeholder="Opcional"
             />
+            <span className="field-helper">
+              Opcional: resultado o impresión diagnóstica.
+            </span>
           </label>
 
           <label className="col-span">
@@ -134,6 +178,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => setTreatment(e.target.value)}
               placeholder="Medicamentos / indicaciones"
             />
+            <span className="field-helper">
+              Opcional: medicamentos, dosis o cuidados.
+            </span>
           </label>
 
           <label>
@@ -144,6 +191,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               placeholder="Ej: 25000"
               inputMode="numeric"
             />
+            <span className="field-helper">
+              Opcional: solo números, sin puntos ni comas.
+            </span>
           </label>
 
           <label>
@@ -153,6 +203,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               value={nextVisitDate}
               onChange={(e) => setNextVisitDate(e.target.value)}
             />
+            <span className="field-helper">
+              Opcional: fecha de control o vacuna.
+            </span>
           </label>
 
           <label className="col-span">
@@ -162,6 +215,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Observaciones, exámenes, etc."
             />
+            <span className="field-helper">
+              Opcional: detalles extra o recomendaciones.
+            </span>
           </label>
 
           <div className="row">
@@ -169,7 +225,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               + Guardar visita
             </button>
             {!canAdd ? (
-              <span className="muted">Completa perrita + fecha + motivo.</span>
+              <span className="muted small">
+                Completa perrita + fecha + motivo.
+              </span>
             ) : null}
           </div>
         </form>

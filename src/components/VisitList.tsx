@@ -98,7 +98,12 @@ export function VisitList({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="muted">No hay visitas con esos filtros.</p>
+        <div className="empty-state">
+          <div className="empty-title">Sin visitas en este filtro</div>
+          <div className="muted small">
+            Prueba limpiar la búsqueda o seleccionar “Todas”.
+          </div>
+        </div>
       ) : (
         <div className="table">
           <div className="thead">
@@ -113,7 +118,12 @@ export function VisitList({
           {filtered.map((v) => (
             <div key={v.id} className="trow">
               <div>{v.date}</div>
-              <div>{petById.get(v.petId)?.name ?? "—"}</div>
+              <div className="pet-cell">
+                <span className="pet-badge" aria-hidden="true">
+                  {(petById.get(v.petId)?.name ?? "—").slice(0, 1).toUpperCase()}
+                </span>
+                <span>{petById.get(v.petId)?.name ?? "—"}</span>
+              </div>
               <div>
                 <div className="strong">{v.reason}</div>
                 <div className="muted small">

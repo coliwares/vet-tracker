@@ -128,8 +128,11 @@ export default function App() {
           <div className="chips">
             {state.pets.map((p) => (
               <div key={p.id} className="chip">
+                <span className="chip-icon" aria-hidden="true">
+                  {p.name.slice(0, 1).toUpperCase()}
+                </span>
                 <span className="strong">{p.name}</span>
-                <span className="muted">
+                <span className="chip-amount">
                   {formatCLP(totalsByPet.get(p.id) ?? 0)}
                 </span>
               </div>

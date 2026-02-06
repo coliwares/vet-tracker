@@ -10,15 +10,20 @@ type Props = {
 
 export function PetForm({ pets, onAdd, onDelete }: Props) {
   const [name, setName] = useState("");
+  const [nameTouched, setNameTouched] = useState(false);
   const [breed, setBreed] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [notes, setNotes] = useState("");
 
-  const canAdd = useMemo(() => name.trim().length >= 2, [name]);
+  const nameValid = useMemo(() => name.trim().length >= 2, [name]);
+  const canAdd = nameValid;
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!canAdd) return;
+    if (!canAdd) {
+      setNameTouched(true);
+      return;
+    }
 
     onAdd({
       id: newId(),
@@ -44,8 +49,15 @@ export function PetForm({ pets, onAdd, onDelete }: Props) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onBlur={() => setNameTouched(true)}
+            className={nameTouched ? (nameValid ? "success" : "error") : ""}
             placeholder="Ginger, Luna, Gin…"
           />
+          {nameTouched && !nameValid ? (
+            <span className="field-helper error">
+              Escribe al menos 2 caracteres.
+            </span>
+          ) : null}
         </label>
 
         <label>
@@ -79,14 +91,19 @@ export function PetForm({ pets, onAdd, onDelete }: Props) {
           <button className="btn" type="submit" disabled={!canAdd}>
             + Agregar perrita
           </button>
-          <span className="muted">
+          <span className="muted small">
             Tip: puedes cargar varias y luego filtrar visitas.
           </span>
         </div>
       </form>
 
       {pets.length === 0 ? (
-        <p className="muted">Aún no agregas perritas.</p>
+        <div className="empty-state">
+          <div className="empty-title">Aún no agregas perritas</div>
+          <div className="muted small">
+            Comienza registrando a tu primera perrita para crear visitas.
+          </div>
+        </div>
       ) : (
         <ul className="list">
           {pets.map((p) => (
