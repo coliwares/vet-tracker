@@ -20,6 +20,7 @@ export default function App() {
   >("dashboard");
   const [dashboardRange, setDashboardRange] = useState<VisitRange>("90d");
   const visitFormRef = useRef<HTMLDivElement | null>(null);
+  const visitListRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     saveState(state);
@@ -46,13 +47,6 @@ export default function App() {
   }
 
   function deletePet(petId: string) {
-    const petName =
-      state.pets.find((p) => p.id === petId)?.name ?? "esta perrita";
-    const ok = confirm(
-      `¿Eliminar ${petName}? También se eliminarán sus visitas asociadas.`,
-    );
-    if (!ok) return;
-
     setState((s) => ({
       ...s,
       pets: s.pets.filter((p) => p.id !== petId),
@@ -110,6 +104,18 @@ export default function App() {
     setActiveSection("visits");
     requestAnimationFrame(() => {
       visitFormRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+
+  function handleViewVisits(petId: string) {
+    setFilterPetId(petId);
+    setSearch("");
+    setActiveSection("visits");
+    requestAnimationFrame(() => {
+      visitListRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
@@ -332,7 +338,7 @@ export default function App() {
               />
             </div>
 
-            <div className="col">
+            <div className="col" ref={visitListRef}>
               <VisitList
                 pets={state.pets}
                 visits={state.visits}
@@ -361,7 +367,12 @@ export default function App() {
 
           <div className="layout single">
             <div className="col">
-              <PetForm pets={state.pets} onAdd={addPet} onDelete={deletePet} />
+              <PetForm
+                pets={state.pets}
+                onAdd={addPet}
+                onDelete={deletePet}
+                onViewVisits={handleViewVisits}
+              />
             </div>
           </div>
         </section>

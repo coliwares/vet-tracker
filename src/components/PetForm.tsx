@@ -1,19 +1,22 @@
 import React, { useMemo, useState } from "react";
 import type { Pet } from "../types";
 import { newId } from "../storage";
+import { formatAge } from "../utils/formatAge";
 
 type Props = {
   pets: Pet[];
   onAdd: (pet: Pet) => void;
   onDelete: (petId: string) => void;
+  onViewVisits: (petId: string) => void;
 };
 
-export function PetForm({ pets, onAdd, onDelete }: Props) {
+export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
   const [breed, setBreed] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [notes, setNotes] = useState("");
+  const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
   const canAdd = nameValid;
@@ -37,6 +40,15 @@ export function PetForm({ pets, onAdd, onDelete }: Props) {
     setBreed("");
     setBirthDate("");
     setNotes("");
+  }
+
+  function handleDelete(petId: string, petName: string) {
+    const ok = confirm(
+      `¿Eliminar ${petName}? También se eliminarán sus visitas asociadas.`,
+    );
+    if (!ok) return;
+    onDelete(petId);
+    setMenuOpenId(null);
   }
 
   return (
@@ -105,28 +117,71 @@ export function PetForm({ pets, onAdd, onDelete }: Props) {
           </div>
         </div>
       ) : (
-        <ul className="list">
+        <div className="pet-cards">
           {pets.map((p) => (
-            <li key={p.id} className="list-item">
-              <div>
-                <div className="strong">{p.name}</div>
-                <div className="muted small">
-                  {p.breed ? `Raza: ${p.breed} · ` : ""}
-                  {p.birthDate ? `Nacimiento: ${p.birthDate}` : ""}
+            <article key={p.id} className="pet-card">
+              <div className="pet-card-header">
+                <div>
+                  <div className="strong pet-name">{p.name}</div>
+                  <div className="muted small">
+                    {p.breed ? `Raza: ${p.breed}` : "Raza: —"}
+                  </div>
                 </div>
-                {p.notes ? <div className="muted small">{p.notes}</div> : null}
+
+                <div className="menu">
+                  <button
+                    className="menu-trigger"
+                    type="button"
+                    aria-label="Opciones"
+                    aria-expanded={menuOpenId === p.id}
+                    onClick={() =>
+                      setMenuOpenId((prev) => (prev === p.id ? null : p.id))
+                    }
+                  >
+                    ⋯
+                  </button>
+                  {menuOpenId === p.id ? (
+                    <div className="menu-panel">
+                      <button
+                        className="menu-item danger"
+                        type="button"
+                        onClick={() => handleDelete(p.id, p.name)}
+                      >
+                        Eliminar perrita
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
               </div>
 
-              <button
-                className="btn danger"
-                onClick={() => onDelete(p.id)}
-                title="Eliminar perrita"
-              >
-                Eliminar
-              </button>
-            </li>
+              <div className="pet-meta">
+                <div>
+                  <div className="muted small">Edad</div>
+                  <div className="strong">{formatAge(p.birthDate)}</div>
+                </div>
+                <div>
+                  <div className="muted small">Nacimiento</div>
+                  <div className="strong">{p.birthDate ?? "—"}</div>
+                </div>
+              </div>
+
+              {p.notes ? <div className="muted small">{p.notes}</div> : null}
+
+              <div className="pet-actions">
+                <button
+                  className="btn secondary"
+                  type="button"
+                  onClick={() => {
+                    setMenuOpenId(null);
+                    onViewVisits(p.id);
+                  }}
+                >
+                  Ver visitas
+                </button>
+              </div>
+            </article>
           ))}
-        </ul>
+        </div>
       )}
     </section>
   );
