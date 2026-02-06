@@ -310,9 +310,19 @@ export default function App() {
             visits={state.visits}
             filterPetId={filterPetId}
             search={search}
+            range={dashboardRange}
+            sortKey={visitSort}
             onChangePetId={setFilterPetId}
             onChangeSearch={setSearch}
+            onChangeRange={setDashboardRange}
+            onChangeSort={setVisitSort}
             onDelete={deleteVisit}
+            onClearFilters={() => {
+              setFilterPetId("");
+              setSearch("");
+              setDashboardRange("90d");
+              setVisitSort("newest");
+            }}
             onNewVisit={handleNewVisit}
           />
         </section>

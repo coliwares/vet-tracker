@@ -1,5 +1,6 @@
-export function formatCLP(value: number): string {
-  if (!Number.isFinite(value)) return "$0";
+export function formatCLP(value?: number | null): string {
+  if (value === undefined || value === null) return "—";
+  if (!Number.isFinite(value)) return "—";
   const rounded = Math.round(value);
 
   try {

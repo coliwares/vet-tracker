@@ -7,6 +7,11 @@ describe("formatCLP", () => {
     expect(formatCLP(0)).toBe("$0");
   });
 
+  it("returns dash for missing values", () => {
+    expect(formatCLP(undefined)).toBe("—");
+    expect(formatCLP(null)).toBe("—");
+  });
+
   it("rounds values before formatting", () => {
     expect(formatCLP(1999.6)).toBe("$2.000");
   });
