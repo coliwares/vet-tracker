@@ -149,7 +149,7 @@ export function VisitList({
         </label>
 
         {onNewVisit ? (
-          <button className="btn" type="button" onClick={onNewVisit}>
+          <button className="btn secondary" type="button" onClick={onNewVisit}>
             Nueva visita
           </button>
         ) : null}
@@ -166,7 +166,7 @@ export function VisitList({
             Crea tu primera visita para comenzar el historial.
           </div>
           {onNewVisit ? (
-            <button className="btn" type="button" onClick={onNewVisit}>
+            <button className="btn secondary" type="button" onClick={onNewVisit}>
               Crear primera visita
             </button>
           ) : null}

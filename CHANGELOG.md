@@ -8,6 +8,9 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - PATCH: bug fixes and small improvements
 
 ## [Unreleased]
+### Changed
+- Top navigation is now sticky and keeps content visible on scroll.
+- Reduced duplicate "Nueva visita" CTAs by removing the Visitas header action and making secondary buttons non-primary.
 
 ## [1.0.0] - 2026-02-06
 ### Added

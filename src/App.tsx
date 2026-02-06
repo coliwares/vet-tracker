@@ -252,7 +252,7 @@ export default function App() {
                   <div className="muted small">
                     Agrega una nueva visita y programa el control.
                   </div>
-                  <button className="btn" onClick={handleNewVisit}>
+                  <button className="btn secondary" onClick={handleNewVisit}>
                     Nueva visita
                   </button>
                 </div>
@@ -275,7 +275,7 @@ export default function App() {
                   <div className="muted small">
                     Prueba con otro rango o registra una nueva visita.
                   </div>
-                  <button className="btn" onClick={handleNewVisit}>
+                  <button className="btn secondary" onClick={handleNewVisit}>
                     Nueva visita
                   </button>
                 </div>
@@ -312,7 +312,7 @@ export default function App() {
                 <div className="muted small">
                   Registra una visita o cambia el filtro.
                 </div>
-                <button className="btn" onClick={handleNewVisit}>
+                <button className="btn secondary" onClick={handleNewVisit}>
                   Nueva visita
                 </button>
               </div>
@@ -351,11 +351,6 @@ export default function App() {
                 Registra nuevas visitas y consulta el historial filtrado.
               </p>
             </div>
-            <div className="section-actions">
-              <button className="btn" type="button" onClick={handleNewVisit}>
-                Nueva visita
-              </button>
-            </div>
           </div>
 
           <div className="layout">
@@ -386,7 +381,6 @@ export default function App() {
                   setVisitRange("all");
                   setVisitSort("newest");
                 }}
-                onNewVisit={handleNewVisit}
               />
             </div>
           </div>
