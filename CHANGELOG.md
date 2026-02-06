@@ -19,3 +19,5 @@ All notable changes to this project will be documented in this file.
 - Refactored Nueva visita form with reordered fields, reason chips, and details section.
 - Added formatted CLP cost input with parsing utilities and tests.
 - Added toast confirmation and quick "Agregar otra visita" action.
+- Redesigned Historial with card layout, expandable details, and chip filters.
+- Added search/sort/filter utilities for visits with unit tests.

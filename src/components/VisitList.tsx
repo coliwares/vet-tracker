@@ -1,64 +1,55 @@
 import { useMemo } from "react";
 import type { Pet, VetVisit } from "../types";
+import { formatCLP } from "../utils/currency";
+import {
+  applyFilters,
+  type SortKey,
+} from "../utils/visitFilters";
+import type { VisitRange } from "../utils/visits";
 
 type Props = {
   pets: Pet[];
   visits: VetVisit[];
   filterPetId: string;
   search: string;
+  range: VisitRange;
+  sortKey: SortKey;
   onChangePetId: (petId: string) => void;
   onChangeSearch: (q: string) => void;
+  onChangeRange: (range: VisitRange) => void;
+  onChangeSort: (sortKey: SortKey) => void;
   onDelete: (visitId: string) => void;
+  onClearFilters: () => void;
   onNewVisit?: () => void;
 };
-
-function formatCLP(n?: number) {
-  if (!n && n !== 0) return "—";
-  try {
-    return new Intl.NumberFormat("es-CL", {
-      style: "currency",
-      currency: "CLP",
-      maximumFractionDigits: 0,
-    }).format(n);
-  } catch {
-    return `$${n}`;
-  }
-}
 
 export function VisitList({
   pets,
   visits,
   filterPetId,
   search,
+  range,
+  sortKey,
   onChangePetId,
   onChangeSearch,
+  onChangeRange,
+  onChangeSort,
   onDelete,
+  onClearFilters,
   onNewVisit,
 }: Props) {
   const petById = useMemo(() => new Map(pets.map((p) => [p.id, p])), [pets]);
 
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return visits
-      .filter((v) => (filterPetId ? v.petId === filterPetId : true))
-      .filter((v) => {
-        if (!q) return true;
-        const hay = [
-          v.reason,
-          v.clinic,
-          v.vet,
-          v.diagnosis,
-          v.treatment,
-          v.notes,
-          petById.get(v.petId)?.name,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        return hay.includes(q);
-      })
-      .sort((a, b) => (a.date < b.date ? 1 : -1));
-  }, [visits, filterPetId, search, petById]);
+  const filtered = useMemo(
+    () =>
+      applyFilters(visits, {
+        petId: filterPetId,
+        range,
+        query: search,
+        sortKey,
+      }),
+    [visits, filterPetId, range, search, sortKey],
+  );
 
   const total = useMemo(
     () => filtered.reduce((acc, v) => acc + (v.costCLP ?? 0), 0),
@@ -69,28 +60,87 @@ export function VisitList({
     <section className="card">
       <h2>📚 Historial</h2>
 
-      <div className="toolbar">
-        <label className="inline">
-          Perrita
-          <select
-            value={filterPetId}
-            onChange={(e) => onChangePetId(e.target.value)}
-          >
-            <option value="">Todas</option>
+      <div className="visit-filters">
+        <div>
+          <div className="muted small">Perrita</div>
+          <div className="filter-chips">
+            <button
+              type="button"
+              className={`chip-toggle ${filterPetId === "" ? "active" : ""}`}
+              onClick={() => onChangePetId("")}
+            >
+              Todas
+            </button>
             {pets.map((p) => (
-              <option key={p.id} value={p.id}>
+              <button
+                key={p.id}
+                type="button"
+                className={`chip-toggle ${
+                  filterPetId === p.id ? "active" : ""
+                }`}
+                onClick={() => onChangePetId(p.id)}
+              >
                 {p.name}
-              </option>
+              </button>
             ))}
-          </select>
-        </label>
+          </div>
+        </div>
+
+        <div>
+          <div className="muted small">Orden</div>
+          <div className="filter-chips">
+            {(
+              [
+                { id: "newest", label: "Más nuevas" },
+                { id: "oldest", label: "Más antiguas" },
+                { id: "cost", label: "Mayor costo" },
+              ] as const
+            ).map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`chip-toggle ${
+                  sortKey === item.id ? "active" : ""
+                }`}
+                onClick={() => onChangeSort(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <div className="muted small">Rango</div>
+          <div className="filter-chips">
+            {(
+              [
+                { id: "30d", label: "30" },
+                { id: "90d", label: "90" },
+                { id: "year", label: "Año" },
+                { id: "all", label: "Todo" },
+              ] as const
+            ).map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`chip-toggle ${
+                  range === item.id ? "active" : ""
+                }`}
+                onClick={() => onChangeRange(item.id)}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         <label className="inline grow">
           Buscar
           <input
             value={search}
             onChange={(e) => onChangeSearch(e.target.value)}
-            placeholder="vacuna, clínica, diagnóstico…"
+            placeholder="motivo, clínica, diagnóstico..."
           />
         </label>
 
@@ -105,54 +155,78 @@ export function VisitList({
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {visits.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-title">Sin visitas en este filtro</div>
+          <div className="empty-title">Aún no registras visitas</div>
           <div className="muted small">
-            Prueba limpiar la búsqueda o seleccionar “Todas”.
+            Crea tu primera visita para comenzar el historial.
           </div>
+          {onNewVisit ? (
+            <button className="btn" type="button" onClick={onNewVisit}>
+              Crear primera visita
+            </button>
+          ) : null}
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="empty-state">
+          <div className="empty-title">Sin resultados con estos filtros</div>
+          <div className="muted small">
+            Prueba ajustar el rango o limpiar la búsqueda.
+          </div>
+          <button className="btn secondary" type="button" onClick={onClearFilters}>
+            Limpiar filtros
+          </button>
         </div>
       ) : (
-        <div className="table">
-          <div className="thead">
-            <div>Fecha</div>
-            <div>Perrita</div>
-            <div>Motivo</div>
-            <div>Clínica</div>
-            <div>Costo</div>
-            <div></div>
-          </div>
-
+        <div className="visit-cards">
           {filtered.map((v) => (
-            <div key={v.id} className="trow">
-              <div>{v.date}</div>
-              <div className="pet-cell">
-                <span className="pet-badge" aria-hidden="true">
-                  {(petById.get(v.petId)?.name ?? "—").slice(0, 1).toUpperCase()}
-                </span>
-                <span>{petById.get(v.petId)?.name ?? "—"}</span>
-              </div>
-              <div>
-                <div className="strong">{v.reason}</div>
-                <div className="muted small">
-                  {v.diagnosis ? `Dx: ${v.diagnosis} · ` : ""}
-                  {v.nextVisitDate ? `Próx: ${v.nextVisitDate}` : ""}
+            <article key={v.id} className="visit-card">
+              <div className="visit-card-header">
+                <div className="visit-date">
+                  <div className="muted small">Fecha</div>
+                  <div className="strong">{v.date}</div>
                 </div>
-                {v.treatment ? (
-                  <div className="muted small">Tx: {v.treatment}</div>
-                ) : null}
-                {v.notes ? (
-                  <div className="muted small">Notas: {v.notes}</div>
-                ) : null}
+                <div className="visit-meta">
+                  <div className="strong">{v.reason}</div>
+                  <div className="muted small">
+                    {petById.get(v.petId)?.name ?? "—"}
+                    {v.clinic ? ` · ${v.clinic}` : ""}
+                  </div>
+                </div>
+                <div className="visit-cost">
+                  <div className="muted small">Costo</div>
+                  <div className="strong">{formatCLP(v.costCLP)}</div>
+                </div>
               </div>
-              <div>{v.clinic ?? "—"}</div>
-              <div>{formatCLP(v.costCLP)}</div>
-              <div className="right">
+
+              <details className="visit-details">
+                <summary>Ver detalles</summary>
+                <div className="visit-details-grid">
+                  <div>
+                    <div className="muted small">Diagnóstico</div>
+                    <div>{v.diagnosis ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="muted small">Tratamiento</div>
+                    <div>{v.treatment ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="muted small">Notas</div>
+                    <div>{v.notes ?? "—"}</div>
+                  </div>
+                  <div>
+                    <div className="muted small">Próxima cita</div>
+                    <div>{v.nextVisitDate ?? "—"}</div>
+                  </div>
+                </div>
+              </details>
+
+              <div className="visit-actions">
                 <button className="btn danger" onClick={() => onDelete(v.id)}>
                   Eliminar
                 </button>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       )}

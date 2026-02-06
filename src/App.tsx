@@ -10,6 +10,7 @@ import {
   getDashboardStats,
   type VisitRange,
 } from "./utils/visits";
+import type { SortKey } from "./utils/visitFilters";
 
 export default function App() {
   const [state, setState] = useState<AppState>(() => loadState());
@@ -19,6 +20,8 @@ export default function App() {
     "dashboard" | "visits" | "pets" | "settings"
   >("dashboard");
   const [dashboardRange, setDashboardRange] = useState<VisitRange>("90d");
+  const [visitRange, setVisitRange] = useState<VisitRange>("all");
+  const [visitSort, setVisitSort] = useState<SortKey>("newest");
   const visitFormRef = useRef<HTMLDivElement | null>(null);
   const visitListRef = useRef<HTMLDivElement | null>(null);
 
@@ -113,6 +116,8 @@ export default function App() {
   function handleViewVisits(petId: string) {
     setFilterPetId(petId);
     setSearch("");
+    setVisitRange("all");
+    setVisitSort("newest");
     setActiveSection("visits");
     requestAnimationFrame(() => {
       visitListRef.current?.scrollIntoView({
@@ -344,9 +349,19 @@ export default function App() {
                 visits={state.visits}
                 filterPetId={filterPetId}
                 search={search}
+                range={visitRange}
+                sortKey={visitSort}
                 onChangePetId={setFilterPetId}
                 onChangeSearch={setSearch}
+                onChangeRange={setVisitRange}
+                onChangeSort={setVisitSort}
                 onDelete={deleteVisit}
+                onClearFilters={() => {
+                  setFilterPetId("");
+                  setSearch("");
+                  setVisitRange("all");
+                  setVisitSort("newest");
+                }}
                 onNewVisit={handleNewVisit}
               />
             </div>
