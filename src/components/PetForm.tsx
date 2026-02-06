@@ -64,6 +64,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
             onBlur={() => setNameTouched(true)}
             className={nameTouched ? (nameValid ? "success" : "error") : ""}
             placeholder="Ginger, Luna, Gin…"
+            tabIndex={1}
           />
           {nameTouched && !nameValid ? (
             <span className="field-helper error">
@@ -78,6 +79,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             placeholder="Pug, Schnoodle…"
+            tabIndex={2}
           />
         </label>
 
@@ -87,6 +89,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
+            tabIndex={3}
           />
         </label>
 
@@ -96,11 +99,12 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Alergias, medicamentos, etc."
+            tabIndex={4}
           />
         </label>
 
         <div className="row">
-          <button className="btn" type="submit" disabled={!canAdd}>
+          <button className="btn" type="submit" disabled={!canAdd} tabIndex={5}>
             + Agregar perrita
           </button>
           <span className="muted small">

@@ -11,6 +11,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 ### Changed
 - Top navigation is now sticky and keeps content visible on scroll.
 - Reduced duplicate "Nueva visita" CTAs by removing the Visitas header action and making secondary buttons non-primary.
+- Updated perritas form tab order to follow Nombre → Raza → Fecha → Notas for keyboard navigation.
 
 ## [1.0.0] - 2026-02-06
 ### Added
