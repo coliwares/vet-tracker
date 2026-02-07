@@ -45,7 +45,7 @@ export function normalizeLocalDateInput(value: string): string {
   if (digits.length === 8) {
     return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
   }
-  return trimmed.replace(/[.\-]/g, "/").replace(/[^0-9/]/g, "");
+  return trimmed.replace(/[.-]/g, "/").replace(/[^0-9/]/g, "");
 }
 
 export function parseLocalDate(value: string): string {

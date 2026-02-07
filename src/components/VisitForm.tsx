@@ -101,7 +101,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
     setNextVisitDate(parsed);
   }
 
-  function openDatePicker(ref: React.RefObject<HTMLInputElement>) {
+  function openDatePicker(ref: React.RefObject<HTMLInputElement | null>) {
     const picker = ref.current;
     if (!picker) return;
     if (picker.showPicker) {
