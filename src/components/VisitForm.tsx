@@ -257,7 +257,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Readonly<Props>) {
                 Describe el motivo en al menos 3 caracteres.
               </span>
             ) : null}
-            <div className="chip-group">
+            <div className="chip-group" role="group" aria-label="Plantillas de motivo">
               {reasonTemplates.map((template) => (
                 <button
                   key={template}

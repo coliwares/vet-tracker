@@ -27,6 +27,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added microcopy clarifying the dashboard range filter affects all metrics.
 - Added last backup metadata (date/time and counts) to the Respaldo section.
 - Expanded JSON import preview with current counts and merge impact details.
+- Improved keyboard accessibility for chips, filters, and option menus with ARIA roles.
 
 ## [1.0.0] - 2026-02-06
 ### Added

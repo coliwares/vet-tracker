@@ -279,52 +279,73 @@ export function PetForm({ pets, onAdd, onUpdate, onDelete, onViewVisits }: Props
         </div>
       ) : (
         <div className="pet-cards">
-          {pets.map((p) => (
-            <article key={p.id} className="pet-card">
-              <div className="pet-card-header">
-                <div>
-                  <div className="strong pet-name">{p.name}</div>
-                  <div className="muted small">
-                    {p.petType ? `Tipo: ${p.petType}` : "Tipo: —"}
-                  </div>
-                  <div className="muted small">
-                    {p.breed ? `Raza: ${p.breed}` : "Raza: —"}
-                  </div>
-                </div>
-
-                <div className="menu">
-                  <button
-                    className="menu-trigger"
-                    type="button"
-                    aria-label="Opciones"
-                    aria-haspopup="menu"
-                    aria-expanded={menuOpenId === p.id}
-                    onClick={() =>
-                      setMenuOpenId((prev) => (prev === p.id ? null : p.id))
-                    }
-                  >
-                    ⋯
-                  </button>
-                  {menuOpenId === p.id ? (
-                    <div className="menu-panel">
-                      <button
-                        className="menu-item"
-                        type="button"
-                        onClick={() => startEdit(p)}
-                      >
-                        Editar mascota
-                      </button>
-                      <button
-                        className="menu-item danger"
-                        type="button"
-                        onClick={() => setPendingDelete(p)}
-                      >
-                        Eliminar mascota
-                      </button>
+          {pets.map((p) => {
+            const menuId = `pet-menu-${p.id}`;
+            return (
+              <article key={p.id} className="pet-card">
+                <div className="pet-card-header">
+                  <div>
+                    <div className="strong pet-name">{p.name}</div>
+                    <div className="muted small">
+                      {p.petType ? `Tipo: ${p.petType}` : "Tipo: —"}
                     </div>
-                  ) : null}
+                    <div className="muted small">
+                      {p.breed ? `Raza: ${p.breed}` : "Raza: —"}
+                    </div>
+                  </div>
+
+                  <div className="menu">
+                    <button
+                      className="menu-trigger"
+                      type="button"
+                      aria-label="Opciones"
+                      aria-haspopup="menu"
+                      aria-expanded={menuOpenId === p.id}
+                      aria-controls={menuOpenId === p.id ? menuId : undefined}
+                      onClick={() =>
+                        setMenuOpenId((prev) => (prev === p.id ? null : p.id))
+                      }
+                    >
+                      ⋯
+                    </button>
+                    {menuOpenId === p.id ? (
+                      <div
+                        id={menuId}
+                        className="menu-panel"
+                        role="menu"
+                        aria-label={`Opciones de ${p.name}`}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") return;
+                          setMenuOpenId(null);
+                          const trigger = (e.currentTarget
+                            .previousElementSibling as HTMLButtonElement | null);
+                          trigger?.focus();
+                        }}
+                        onBlur={(e) => {
+                          if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+                          setMenuOpenId(null);
+                        }}
+                      >
+                        <button
+                          className="menu-item"
+                          type="button"
+                          role="menuitem"
+                          onClick={() => startEdit(p)}
+                        >
+                          Editar mascota
+                        </button>
+                        <button
+                          className="menu-item danger"
+                          type="button"
+                          role="menuitem"
+                          onClick={() => setPendingDelete(p)}
+                        >
+                          Eliminar mascota
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
 
               <div className="pet-meta">
                 <div>
@@ -353,8 +374,9 @@ export function PetForm({ pets, onAdd, onUpdate, onDelete, onViewVisits }: Props
                   Ver visitas
                 </button>
               </div>
-            </article>
-          ))}
+              </article>
+            );
+          })}
         </div>
       )}
       {editingPet ? (

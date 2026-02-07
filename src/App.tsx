@@ -204,7 +204,7 @@ export default function App() {
         <section className="section">
           <div className="dashboard-controls">
             <div className="muted small">Rango</div>
-            <div className="range-filter" role="group" aria-label="Rango">
+            <div className="range-filter" role="radiogroup" aria-label="Rango">
               {(
                 [
                   { id: "30d", label: "Últimos 30" },
@@ -219,6 +219,8 @@ export default function App() {
                   className={`range-btn ${
                     dashboardRange === item.id ? "active" : ""
                   }`}
+                  role="radio"
+                  aria-checked={dashboardRange === item.id}
                   onClick={() => setDashboardRange(item.id)}
                 >
                   {item.label}
