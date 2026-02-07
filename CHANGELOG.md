@@ -15,6 +15,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Localized date inputs to dd/mm/yyyy with month/year selectors for faster navigation while keeping stored ISO dates.
 - Added native date picker triggers for birth date and visit date fields while keeping dd/mm/yyyy inputs.
 - Removed month/year dropdowns from date inputs and kept the picker button inline with the date field.
+- Added a success toast after saving a perrita so users get immediate confirmation.
 
 ## [1.0.0] - 2026-02-06
 ### Added

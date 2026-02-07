@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { Pet } from "../types";
 import { newId } from "../storage";
 import { formatAge } from "../utils/formatAge";
@@ -26,10 +26,19 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [notes, setNotes] = useState("");
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Pet | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
   const birthDatePickerRef = useRef<HTMLInputElement | null>(null);
+  const toastTimerRef = useRef<number | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
   const canAdd = nameValid;
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        globalThis.clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,13 +47,21 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
       return;
     }
 
+    const petName = name.trim();
+
     onAdd({
       id: newId(),
-      name: name.trim(),
+      name: petName,
       breed: breed.trim() || undefined,
       birthDate: birthDate || undefined,
       notes: notes.trim() || undefined,
     });
+
+    setToast(`✅ ${petName} guardada correctamente.`);
+    if (toastTimerRef.current) globalThis.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = globalThis.setTimeout(() => {
+      setToast(null);
+    }, 3200);
 
     setName("");
     setBreed("");
@@ -81,6 +98,12 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   return (
     <section className="card">
       <h2>🐶 Perritas</h2>
+
+      {toast ? (
+        <div className="toast" role="status" aria-live="polite">
+          {toast}
+        </div>
+      ) : null}
 
       <form onSubmit={submit} className="grid">
         <label>
