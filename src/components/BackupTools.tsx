@@ -90,7 +90,7 @@ export function BackupTools({ state, onImport }: Props) {
         <div className="backup-preview">
           <div className="strong">
             Vas a importar {pendingImport.visits.length} visitas y {" "}
-            {pendingImport.pets.length} perritas.
+            {pendingImport.pets.length} mascotas.
           </div>
           <div className="muted small">
             Puedes reemplazar todo o combinar (deduplicar) usando las claves
@@ -114,7 +114,7 @@ export function BackupTools({ state, onImport }: Props) {
         <div className="merge-summary" role="status" aria-live="polite">
           <div className="strong">Resultado de la combinacion</div>
           <div className="muted small">
-            Perritas: {mergeSummary.pets.kept} mantenidas, {" "}
+            Mascotas: {mergeSummary.pets.kept} mantenidas, {" "}
             {mergeSummary.pets.discarded} descartadas.
           </div>
           <div className="muted small">

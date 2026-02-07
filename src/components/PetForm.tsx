@@ -20,6 +20,7 @@ type Props = {
 export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
+  const [petType, setPetType] = useState("");
   const [breed, setBreed] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [birthDateInput, setBirthDateInput] = useState("");
@@ -28,10 +29,11 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [pendingDelete, setPendingDelete] = useState<Pet | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const birthDatePickerRef = useRef<HTMLInputElement | null>(null);
-  const toastTimerRef = useRef<number | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
   const canAdd = nameValid;
+  const petTypeOptions = ["Perro", "Gato", "Conejo", "Otro"];
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) {
@@ -52,6 +54,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     onAdd({
       id: newId(),
       name: petName,
+      petType: petType || undefined,
       breed: breed.trim() || undefined,
       birthDate: birthDate || undefined,
       notes: notes.trim() || undefined,
@@ -64,6 +67,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     }, 3200);
 
     setName("");
+    setPetType("");
     setBreed("");
     setBirthDate("");
     setBirthDateInput("");
@@ -97,7 +101,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
 
   return (
     <section className="card">
-      <h2>🐶 Perritas</h2>
+      <h2>🐶 Mascotas</h2>
 
       {toast ? (
         <div className="toast" role="status" aria-live="polite">
@@ -124,12 +128,28 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
         </label>
 
         <label>
+          Tipo de mascota
+          <select
+            value={petType}
+            onChange={(e) => setPetType(e.target.value)}
+            tabIndex={2}
+          >
+            <option value="">Selecciona un tipo</option>
+            {petTypeOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label>
           Raza
           <input
             value={breed}
             onChange={(e) => setBreed(e.target.value)}
             placeholder="Pug, Schnoodle…"
-            tabIndex={2}
+            tabIndex={3}
           />
         </label>
 
@@ -141,7 +161,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
               onChange={(e) => handleBirthDateInput(e.target.value)}
               placeholder="dd/mm/aaaa"
               inputMode="numeric"
-              tabIndex={3}
+              tabIndex={4}
             />
             <button
               type="button"
@@ -171,13 +191,13 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Alergias, medicamentos, etc."
-            tabIndex={4}
+            tabIndex={5}
           />
         </label>
 
         <div className="row">
-          <button className="btn" type="submit" disabled={!canAdd} tabIndex={5}>
-            + Agregar perrita
+          <button className="btn" type="submit" disabled={!canAdd} tabIndex={6}>
+            + Agregar mascota
           </button>
           <span className="muted small">
             Tip: puedes cargar varias y luego filtrar visitas.
@@ -187,9 +207,9 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
 
       {pets.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-title">Aún no agregas perritas</div>
+          <div className="empty-title">Aún no agregas mascotas</div>
           <div className="muted small">
-            Comienza registrando a tu primera perrita para crear visitas.
+            Comienza registrando a tu primera mascota para crear visitas.
           </div>
         </div>
       ) : (
@@ -199,6 +219,9 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
               <div className="pet-card-header">
                 <div>
                   <div className="strong pet-name">{p.name}</div>
+                  <div className="muted small">
+                    {p.petType ? `Tipo: ${p.petType}` : "Tipo: —"}
+                  </div>
                   <div className="muted small">
                     {p.breed ? `Raza: ${p.breed}` : "Raza: —"}
                   </div>
@@ -224,7 +247,7 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
                         type="button"
                         onClick={() => setPendingDelete(p)}
                       >
-                        Eliminar perrita
+                        Eliminar mascota
                       </button>
                     </div>
                   ) : null}
@@ -267,9 +290,9 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
         title={
           pendingDelete
             ? `Eliminar ${pendingDelete.name}`
-            : "Eliminar perrita"
+            : "Eliminar mascota"
         }
-        description="Esto eliminará la perrita y todas sus visitas asociadas."
+        description="Esto eliminará la mascota y todas sus visitas asociadas."
         confirmText="Eliminar"
         onConfirm={handleDeleteConfirm}
         onCancel={() => setPendingDelete(null)}

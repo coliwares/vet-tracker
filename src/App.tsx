@@ -162,7 +162,7 @@ export default function App() {
             [
               { id: "dashboard", label: "Dashboard" },
               { id: "visits", label: "Visitas" },
-              { id: "pets", label: "Perritas" },
+              { id: "pets", label: "Mascotas" },
               { id: "settings", label: "Ajustes" },
             ] as const
           ).map((item) => (
@@ -212,7 +212,7 @@ export default function App() {
             <div>
               <h1>🐾 Vet Visits Tracker</h1>
               <p className="muted">
-                Registro simple de visitas al veterinario para tus perritas
+                Registro simple de visitas al veterinario para tus mascotas
                 (offline).
               </p>
             </div>
@@ -223,7 +223,7 @@ export default function App() {
                 <div className="strong">{filteredVisits.length}</div>
               </div>
               <div className="stat">
-                <div className="muted small">Perritas</div>
+                <div className="muted small">Mascotas</div>
                 <div className="strong">{petsInRangeCount}</div>
               </div>
               <div className="stat">
@@ -243,7 +243,7 @@ export default function App() {
                   </div>
                   <div className="muted small">
                     {state.pets.find((p) => p.id === nextAppointment.visit.petId)
-                      ?.name ?? "Perrita"}
+                      ?.name ?? "Mascota"}
                     {nextAppointment.visit.clinic
                       ? ` · ${nextAppointment.visit.clinic}`
                       : ""}
@@ -288,7 +288,7 @@ export default function App() {
 
           {filteredVisits.length > 0 ? (
             <section className="card">
-              <h2>📊 Gasto por perrita</h2>
+              <h2>📊 Gasto por mascota</h2>
               <div className="chips">
                 {state.pets.map((p) => {
                   const amount = totalsByPet.get(p.id);
@@ -309,7 +309,7 @@ export default function App() {
             </section>
           ) : (
             <section className="card">
-              <h2>📊 Gasto por perrita</h2>
+              <h2>📊 Gasto por mascota</h2>
               <div className="empty-state">
                 <div className="empty-title">Sin datos para este rango</div>
                 <div className="muted small">
@@ -394,7 +394,7 @@ export default function App() {
         <section className="section">
           <div className="section-header">
             <div>
-              <h2>Perritas</h2>
+              <h2>Mascotas</h2>
               <p className="muted small">
                 Administra perfiles, notas y datos base.
               </p>
@@ -463,7 +463,7 @@ export default function App() {
       <ConfirmDialog
         open={showResetDialog}
         title="Borrar todo"
-        description="Esto eliminará perritas y visitas en este navegador. Esta acción no se puede deshacer."
+        description="Esto eliminará mascotas y visitas en este navegador. Esta acción no se puede deshacer."
         confirmText="Borrar todo"
         requireTyping="BORRAR"
         onConfirm={resetAll}

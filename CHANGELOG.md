@@ -16,6 +16,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added native date picker triggers for birth date and visit date fields while keeping dd/mm/yyyy inputs.
 - Removed month/year dropdowns from date inputs and kept the picker button inline with the date field.
 - Added a success toast after saving a perrita so users get immediate confirmation.
+- Updated UI copy to use "mascota" and added a pet type field (perro/gato/conejo/otro).
 
 ## [1.0.0] - 2026-02-06
 ### Added

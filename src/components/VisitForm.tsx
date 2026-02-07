@@ -146,7 +146,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
         ? undefined
         : parsedCostValue;
 
-    const petName = pets.find((p) => p.id === petId)?.name ?? "tu perrita";
+    const petName = pets.find((p) => p.id === petId)?.name ?? "tu mascota";
 
     onAdd({
       id: newId(),
@@ -182,7 +182,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
 
       {pets.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-title">Primero registra una perrita</div>
+          <div className="empty-title">Primero registra una mascota</div>
           <div className="muted small">
             Luego podrás anotar vacunas, controles y tratamientos.
           </div>
@@ -190,7 +190,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
       ) : (
         <form onSubmit={submit} className="grid">
           <label>
-            Perrita *
+            Mascota *
             <select
               value={petId}
               onChange={(e) => setPetId(e.target.value)}
@@ -204,7 +204,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               ))}
             </select>
             {petTouched && !petValid ? (
-              <span className="field-helper error">Selecciona una perrita.</span>
+              <span className="field-helper error">Selecciona una mascota.</span>
             ) : null}
           </label>
 
@@ -413,7 +413,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
             </button>
             {!canAdd ? (
               <span className="muted small">
-                Completa perrita + fecha + motivo.
+                Completa mascota + fecha + motivo.
               </span>
             ) : null}
           </div>

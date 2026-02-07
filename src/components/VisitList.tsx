@@ -62,8 +62,8 @@ export function VisitList({
       <h2>📚 Historial</h2>
 
       <div className="visit-filters">
-        <div role="group" aria-label="Filtro por perrita">
-          <div className="muted small">Perrita</div>
+        <div role="group" aria-label="Filtro por mascota">
+          <div className="muted small">Mascota</div>
           <div className="filter-chips">
             <button
               type="button"
