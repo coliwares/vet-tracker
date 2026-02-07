@@ -260,10 +260,10 @@ export default function App() {
                 <div className="empty-state">
                   <div className="empty-title">Sin próximas citas</div>
                   <div className="muted small">
-                    Agrega una nueva visita y programa el control.
+                    Crea una visita y agenda la próxima fecha de control.
                   </div>
                   <button className="btn secondary" onClick={handleNewVisit}>
-                    Nueva visita
+                    Crear visita
                   </button>
                 </div>
               )}
@@ -283,10 +283,10 @@ export default function App() {
                 <div className="empty-state">
                   <div className="empty-title">Sin visitas en este rango</div>
                   <div className="muted small">
-                    Prueba con otro rango o registra una nueva visita.
+                    Prueba otro rango o crea una visita para verlo aqui.
                   </div>
                   <button className="btn secondary" onClick={handleNewVisit}>
-                    Nueva visita
+                    Crear visita
                   </button>
                 </div>
               )}
@@ -320,10 +320,10 @@ export default function App() {
               <div className="empty-state">
                 <div className="empty-title">Sin datos para este rango</div>
                 <div className="muted small">
-                  Registra una visita o cambia el filtro.
+                  Crea una visita o ajusta el rango para ver resultados.
                 </div>
                 <button className="btn secondary" onClick={handleNewVisit}>
-                  Nueva visita
+                  Crear visita
                 </button>
               </div>
             </section>

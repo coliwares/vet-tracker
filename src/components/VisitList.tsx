@@ -174,13 +174,13 @@ export function VisitList({
 
       {visits.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-title">Aún no registras visitas</div>
+          <div className="empty-title">Aún no hay visitas</div>
           <div className="muted small">
-            Crea tu primera visita para comenzar el historial.
+            Crea la primera visita para empezar a construir el historial.
           </div>
           {onNewVisit ? (
             <button className="btn secondary" type="button" onClick={onNewVisit}>
-              Crear primera visita
+              Crear visita
             </button>
           ) : null}
         </div>
@@ -188,11 +188,18 @@ export function VisitList({
         <div className="empty-state">
           <div className="empty-title">Sin resultados con estos filtros</div>
           <div className="muted small">
-            Prueba ajustar el rango o limpiar la búsqueda.
+            Ajusta el rango o limpia la busqueda para ver visitas.
           </div>
-          <button className="btn secondary" type="button" onClick={onClearFilters}>
-            Limpiar filtros
-          </button>
+          <div className="row">
+            <button className="btn secondary" type="button" onClick={onClearFilters}>
+              Limpiar filtros
+            </button>
+            {onNewVisit ? (
+              <button className="btn secondary" type="button" onClick={onNewVisit}>
+                Crear visita
+              </button>
+            ) : null}
+          </div>
         </div>
       ) : (
         <div className="visit-cards">
