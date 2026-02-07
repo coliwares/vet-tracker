@@ -13,11 +13,12 @@ import { ConfirmDialog } from "./ConfirmDialog";
 type Props = {
   pets: Pet[];
   onAdd: (pet: Pet) => void;
+  onUpdate: (pet: Pet) => void;
   onDelete: (petId: string) => void;
   onViewVisits: (petId: string) => void;
 };
 
-export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
+export function PetForm({ pets, onAdd, onUpdate, onDelete, onViewVisits }: Props) {
   const [name, setName] = useState("");
   const [nameTouched, setNameTouched] = useState(false);
   const [petType, setPetType] = useState("");
@@ -27,11 +28,21 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [notes, setNotes] = useState("");
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Pet | null>(null);
+  const [editingPet, setEditingPet] = useState<Pet | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editNameTouched, setEditNameTouched] = useState(false);
+  const [editType, setEditType] = useState("");
+  const [editBreed, setEditBreed] = useState("");
+  const [editBirthDate, setEditBirthDate] = useState("");
+  const [editBirthDateInput, setEditBirthDateInput] = useState("");
+  const [editNotes, setEditNotes] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const birthDatePickerRef = useRef<HTMLInputElement | null>(null);
+  const editBirthDatePickerRef = useRef<HTMLInputElement | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
+  const editNameValid = useMemo(() => editName.trim().length >= 2, [editName]);
   const canAdd = nameValid;
   const petTypeOptions = ["Perro", "Gato", "Conejo", "Otro"];
   useEffect(() => {
@@ -81,6 +92,13 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     setBirthDate(parsed);
   }
 
+  function handleEditBirthDateInput(value: string) {
+    const normalized = normalizeLocalDateInput(value);
+    setEditBirthDateInput(normalized);
+    const parsed = parseLocalDate(normalized);
+    setEditBirthDate(parsed);
+  }
+
   function openBirthDatePicker() {
     const picker = birthDatePickerRef.current;
     if (!picker) return;
@@ -90,6 +108,53 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     }
     picker.focus();
     picker.click();
+  }
+
+  function openEditBirthDatePicker() {
+    const picker = editBirthDatePickerRef.current;
+    if (!picker) return;
+    if (picker.showPicker) {
+      picker.showPicker();
+      return;
+    }
+    picker.focus();
+    picker.click();
+  }
+
+  function startEdit(pet: Pet) {
+    setEditingPet(pet);
+    setEditName(pet.name);
+    setEditType(pet.petType ?? "");
+    setEditBreed(pet.breed ?? "");
+    setEditBirthDate(pet.birthDate ?? "");
+    setEditBirthDateInput(formatIsoToLocal(pet.birthDate));
+    setEditNotes(pet.notes ?? "");
+    setEditNameTouched(false);
+    setMenuOpenId(null);
+  }
+
+  function cancelEdit() {
+    setEditingPet(null);
+  }
+
+  function submitEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingPet) return;
+    if (!editNameValid) {
+      setEditNameTouched(true);
+      return;
+    }
+
+    onUpdate({
+      ...editingPet,
+      name: editName.trim(),
+      petType: editType || undefined,
+      breed: editBreed.trim() || undefined,
+      birthDate: editBirthDate || undefined,
+      notes: editNotes.trim() || undefined,
+    });
+
+    setEditingPet(null);
   }
 
   function handleDeleteConfirm() {
@@ -243,6 +308,13 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
                   {menuOpenId === p.id ? (
                     <div className="menu-panel">
                       <button
+                        className="menu-item"
+                        type="button"
+                        onClick={() => startEdit(p)}
+                      >
+                        Editar mascota
+                      </button>
+                      <button
                         className="menu-item danger"
                         type="button"
                         onClick={() => setPendingDelete(p)}
@@ -285,6 +357,110 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
           ))}
         </div>
       )}
+      {editingPet ? (
+        <div
+          className="dialog-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="edit-mascota-title"
+        >
+          <div className="dialog">
+            <h3 id="edit-mascota-title">Editar mascota</h3>
+            <form onSubmit={submitEdit} className="grid">
+              <label>
+                Nombre *
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onBlur={() => setEditNameTouched(true)}
+                  className={
+                    editNameTouched ? (editNameValid ? "success" : "error") : ""
+                  }
+                  placeholder="Ginger, Luna, Gin…"
+                />
+                {editNameTouched && !editNameValid ? (
+                  <span className="field-helper error">
+                    Escribe al menos 2 caracteres.
+                  </span>
+                ) : null}
+              </label>
+
+              <label>
+                Tipo de mascota
+                <select
+                  value={editType}
+                  onChange={(e) => setEditType(e.target.value)}
+                >
+                  <option value="">Selecciona un tipo</option>
+                  {petTypeOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Raza
+                <input
+                  value={editBreed}
+                  onChange={(e) => setEditBreed(e.target.value)}
+                  placeholder="Pug, Schnoodle…"
+                />
+              </label>
+
+              <label>
+                Nacimiento
+                <div className="date-row">
+                  <input
+                    value={editBirthDateInput || formatIsoToLocal(editBirthDate)}
+                    onChange={(e) => handleEditBirthDateInput(e.target.value)}
+                    placeholder="dd/mm/aaaa"
+                    inputMode="numeric"
+                  />
+                  <button
+                    type="button"
+                    className="date-picker-btn"
+                    onClick={openEditBirthDatePicker}
+                    aria-label="Abrir selector de fecha"
+                  >
+                    📅
+                  </button>
+                  <input
+                    ref={editBirthDatePickerRef}
+                    className="date-picker-native"
+                    type="date"
+                    value={editBirthDate}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      setEditBirthDate(next);
+                      setEditBirthDateInput(formatIsoToLocal(next));
+                    }}
+                  />
+                </div>
+              </label>
+
+              <label className="col-span">
+                Notas
+                <input
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  placeholder="Alergias, medicamentos, etc."
+                />
+              </label>
+
+              <div className="row">
+                <button className="btn secondary" type="button" onClick={cancelEdit}>
+                  Cancelar
+                </button>
+                <button className="btn" type="submit" disabled={!editNameValid}>
+                  Guardar cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
       <ConfirmDialog
         open={Boolean(pendingDelete)}
         title={

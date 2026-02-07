@@ -55,6 +55,13 @@ export default function App() {
     if (state.pets.length === 0) setFilterPetId(pet.id);
   }
 
+  function updatePet(nextPet: Pet) {
+    setState((s) => ({
+      ...s,
+      pets: s.pets.map((p) => (p.id === nextPet.id ? nextPet : p)),
+    }));
+  }
+
   function deletePet(petId: string) {
     setState((s) => ({
       ...s,
@@ -406,6 +413,7 @@ export default function App() {
               <PetForm
                 pets={state.pets}
                 onAdd={addPet}
+                onUpdate={updatePet}
                 onDelete={deletePet}
                 onViewVisits={handleViewVisits}
               />

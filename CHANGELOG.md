@@ -17,6 +17,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Removed month/year dropdowns from date inputs and kept the picker button inline with the date field.
 - Added a success toast after saving a perrita so users get immediate confirmation.
 - Updated UI copy to use "mascota" and added a pet type field (perro/gato/conejo/otro).
+- Added mascota edit flow via modal dialog with full field updates.
 
 ## [1.0.0] - 2026-02-06
 ### Added
