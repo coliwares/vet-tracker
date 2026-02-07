@@ -251,6 +251,44 @@
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
+.date-row {
+	display: flex;
+	gap: 8px;
+	flex-wrap: nowrap;
+	align-items: center;
+}
+
+.date-row input {
+	flex: 1 1 160px;
+	min-width: 0;
+}
+
+
+.date-picker-btn {
+	appearance: none;
+	border: 1px solid rgba(30, 42, 42, 0.18);
+	background: #ffffff;
+	color: inherit;
+	border-radius: 12px;
+	padding: 10px 12px;
+	cursor: pointer;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.date-picker-btn:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-soft);
+	border-color: rgba(30, 42, 42, 0.28);
+}
+
+.date-picker-native {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	pointer-events: none;
+}
+
 label {
 	display: grid;
 	gap: 6px;

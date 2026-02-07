@@ -12,6 +12,7 @@ import {
   type VisitRange,
 } from "./utils/visits";
 import type { SortKey } from "./utils/visitFilters";
+import { formatIsoToDisplay } from "./utils/date";
 
 export default function App() {
   const [state, setState] = useState<AppState>(() => loadState());
@@ -237,7 +238,9 @@ export default function App() {
               <h2>📅 Próxima cita</h2>
               {nextAppointment ? (
                 <div className="card-body">
-                  <div className="strong">{nextAppointment.date}</div>
+                  <div className="strong">
+                    {formatIsoToDisplay(nextAppointment.date)}
+                  </div>
                   <div className="muted small">
                     {state.pets.find((p) => p.id === nextAppointment.visit.petId)
                       ?.name ?? "Perrita"}
@@ -263,7 +266,7 @@ export default function App() {
               <h2>🧾 Última visita registrada</h2>
               {lastVisit ? (
                 <div className="card-body">
-                  <div className="strong">{lastVisit.date}</div>
+                  <div className="strong">{formatIsoToDisplay(lastVisit.date)}</div>
                   <div className="muted small">{lastVisit.reason}</div>
                   <div className="chip-amount">
                     {formatCLP(lastVisit.costCLP)}

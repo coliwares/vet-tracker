@@ -2,6 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import type { Pet, VetVisit } from "../types";
 import { newId } from "../storage";
 import { formatCLP, parseCLP } from "../utils/currency";
+import {
+  formatIsoToLocal,
+  normalizeLocalDateInput,
+  parseLocalDate,
+} from "../utils/date";
 
 type Props = {
   pets: Pet[];
@@ -10,11 +15,12 @@ type Props = {
 };
 
 export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
-  const today = new Date().toISOString().slice(0, 10);
+  const todayIso = new Date().toISOString().slice(0, 10);
   const toastTimerRef = useRef<number | null>(null);
 
   const [petId, setPetId] = useState(defaultPetId ?? pets[0]?.id ?? "");
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(todayIso);
+  const [dateInput, setDateInput] = useState(formatIsoToLocal(todayIso));
   const [reason, setReason] = useState("");
   const [costInput, setCostInput] = useState<string>("");
   const [clinic, setClinic] = useState("");
@@ -22,6 +28,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
   const [diagnosis, setDiagnosis] = useState("");
   const [treatment, setTreatment] = useState("");
   const [nextVisitDate, setNextVisitDate] = useState("");
+  const [nextVisitDateInput, setNextVisitDateInput] = useState("");
   const [notes, setNotes] = useState("");
   const [petTouched, setPetTouched] = useState(false);
   const [dateTouched, setDateTouched] = useState(false);
@@ -29,6 +36,8 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
   const [costTouched, setCostTouched] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const visitDatePickerRef = useRef<HTMLInputElement | null>(null);
+  const nextVisitDatePickerRef = useRef<HTMLInputElement | null>(null);
 
   const reasonTemplates = [
     "Vacuna",
@@ -60,7 +69,8 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
 
   function resetForm(keepPet: boolean) {
     if (!keepPet) setPetId("");
-    setDate(today);
+    setDate(todayIso);
+    setDateInput(formatIsoToLocal(todayIso));
     setReason("");
     setCostInput("");
     setClinic("");
@@ -68,12 +78,38 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
     setDiagnosis("");
     setTreatment("");
     setNextVisitDate("");
+    setNextVisitDateInput("");
     setNotes("");
     setReasonTouched(false);
     setDateTouched(false);
     setPetTouched(false);
     setCostTouched(false);
     setDetailsOpen(false);
+  }
+
+  function handleDateInput(value: string) {
+    const normalized = normalizeLocalDateInput(value);
+    setDateInput(normalized);
+    const parsed = parseLocalDate(normalized);
+    setDate(parsed);
+  }
+
+  function handleNextVisitInput(value: string) {
+    const normalized = normalizeLocalDateInput(value);
+    setNextVisitDateInput(normalized);
+    const parsed = parseLocalDate(normalized);
+    setNextVisitDate(parsed);
+  }
+
+  function openDatePicker(ref: React.RefObject<HTMLInputElement>) {
+    const picker = ref.current;
+    if (!picker) return;
+    if (picker.showPicker) {
+      picker.showPicker();
+      return;
+    }
+    picker.focus();
+    picker.click();
   }
 
   function showToast(message: string) {
@@ -128,7 +164,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
       updatedAt: nowIso,
     });
 
-    showToast(`✅ Visita guardada para ${petName} – ${date}`);
+    showToast(
+      `✅ Visita guardada para ${petName} – ${formatIsoToLocal(date)}`,
+    );
     resetForm(true);
   }
 
@@ -172,13 +210,35 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
 
           <label>
             Fecha *
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              onBlur={() => setDateTouched(true)}
-              className={dateTouched ? (dateValid ? "success" : "error") : ""}
-            />
+            <div className="date-row">
+              <input
+                value={dateInput || formatIsoToLocal(date)}
+                onChange={(e) => handleDateInput(e.target.value)}
+                onBlur={() => setDateTouched(true)}
+                className={dateTouched ? (dateValid ? "success" : "error") : ""}
+                placeholder="dd/mm/aaaa"
+                inputMode="numeric"
+              />
+              <button
+                type="button"
+                className="date-picker-btn"
+                onClick={() => openDatePicker(visitDatePickerRef)}
+                aria-label="Abrir selector de fecha"
+              >
+                📅
+              </button>
+              <input
+                ref={visitDatePickerRef}
+                className="date-picker-native"
+                type="date"
+                value={date}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setDate(next);
+                  setDateInput(formatIsoToLocal(next));
+                }}
+              />
+            </div>
             {dateTouched && !dateValid ? (
               <span className="field-helper error">Selecciona una fecha.</span>
             ) : null}
@@ -308,11 +368,33 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
 
           <label>
             Próxima cita
-            <input
-              type="date"
-              value={nextVisitDate}
-              onChange={(e) => setNextVisitDate(e.target.value)}
-            />
+            <div className="date-row">
+              <input
+                value={nextVisitDateInput || formatIsoToLocal(nextVisitDate)}
+                onChange={(e) => handleNextVisitInput(e.target.value)}
+                placeholder="dd/mm/aaaa"
+                inputMode="numeric"
+              />
+              <button
+                type="button"
+                className="date-picker-btn"
+                onClick={() => openDatePicker(nextVisitDatePickerRef)}
+                aria-label="Abrir selector de fecha"
+              >
+                📅
+              </button>
+              <input
+                ref={nextVisitDatePickerRef}
+                className="date-picker-native"
+                type="date"
+                value={nextVisitDate}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setNextVisitDate(next);
+                  setNextVisitDateInput(formatIsoToLocal(next));
+                }}
+              />
+            </div>
             <span className="field-helper">
               Opcional: fecha de control o vacuna.
             </span>

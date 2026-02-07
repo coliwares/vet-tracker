@@ -1,7 +1,13 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import type { Pet } from "../types";
 import { newId } from "../storage";
 import { formatAge } from "../utils/formatAge";
+import {
+  formatIsoToDisplay,
+  formatIsoToLocal,
+  normalizeLocalDateInput,
+  parseLocalDate,
+} from "../utils/date";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 type Props = {
@@ -16,9 +22,11 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
   const [nameTouched, setNameTouched] = useState(false);
   const [breed, setBreed] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [birthDateInput, setBirthDateInput] = useState("");
   const [notes, setNotes] = useState("");
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<Pet | null>(null);
+  const birthDatePickerRef = useRef<HTMLInputElement | null>(null);
 
   const nameValid = useMemo(() => name.trim().length >= 2, [name]);
   const canAdd = nameValid;
@@ -41,7 +49,26 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
     setName("");
     setBreed("");
     setBirthDate("");
+    setBirthDateInput("");
     setNotes("");
+  }
+
+  function handleBirthDateInput(value: string) {
+    const normalized = normalizeLocalDateInput(value);
+    setBirthDateInput(normalized);
+    const parsed = parseLocalDate(normalized);
+    setBirthDate(parsed);
+  }
+
+  function openBirthDatePicker() {
+    const picker = birthDatePickerRef.current;
+    if (!picker) return;
+    if (picker.showPicker) {
+      picker.showPicker();
+      return;
+    }
+    picker.focus();
+    picker.click();
   }
 
   function handleDeleteConfirm() {
@@ -85,12 +112,34 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
 
         <label>
           Nacimiento
-          <input
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-            tabIndex={3}
-          />
+          <div className="date-row">
+            <input
+              value={birthDateInput || formatIsoToLocal(birthDate)}
+              onChange={(e) => handleBirthDateInput(e.target.value)}
+              placeholder="dd/mm/aaaa"
+              inputMode="numeric"
+              tabIndex={3}
+            />
+            <button
+              type="button"
+              className="date-picker-btn"
+              onClick={openBirthDatePicker}
+              aria-label="Abrir selector de fecha"
+            >
+              📅
+            </button>
+            <input
+              ref={birthDatePickerRef}
+              className="date-picker-native"
+              type="date"
+              value={birthDate}
+              onChange={(e) => {
+                const next = e.target.value;
+                setBirthDate(next);
+                setBirthDateInput(formatIsoToLocal(next));
+              }}
+            />
+          </div>
         </label>
 
         <label className="col-span">
@@ -166,7 +215,9 @@ export function PetForm({ pets, onAdd, onDelete, onViewVisits }: Props) {
                 </div>
                 <div>
                   <div className="muted small">Nacimiento</div>
-                  <div className="strong">{p.birthDate ?? "—"}</div>
+                  <div className="strong">
+                    {formatIsoToDisplay(p.birthDate)}
+                  </div>
                 </div>
               </div>
 

@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import type { Pet, VetVisit } from "../types";
 import { formatCLP } from "../utils/currency";
+import { formatIsoToDisplay } from "../utils/date";
 import {
   applyFilters,
   type SortKey,
@@ -188,7 +189,7 @@ export function VisitList({
               <div className="visit-card-header">
                 <div className="visit-date">
                   <div className="muted small">Fecha</div>
-                  <div className="strong">{v.date}</div>
+                  <div className="strong">{formatIsoToDisplay(v.date)}</div>
                 </div>
                 <div className="visit-meta">
                   <div className="strong">{v.reason}</div>
@@ -220,7 +221,7 @@ export function VisitList({
                   </div>
                   <div>
                     <div className="muted small">Próxima cita</div>
-                    <div>{v.nextVisitDate ?? "—"}</div>
+                    <div>{formatIsoToDisplay(v.nextVisitDate)}</div>
                   </div>
                 </div>
               </details>
