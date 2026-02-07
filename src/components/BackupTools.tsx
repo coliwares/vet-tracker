@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import type { AppState } from "../types";
-import { downloadJson, readJsonFile } from "../storage";
+import { downloadJson, loadBackupMeta, readJsonFile, saveBackupMeta } from "../storage";
 import { mergeData, type MergeSummary } from "../utils/backupMerge";
 
 type Props = {
@@ -12,6 +12,22 @@ export function BackupTools({ state, onImport }: Props) {
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [pendingImport, setPendingImport] = useState<AppState | null>(null);
   const [mergeSummary, setMergeSummary] = useState<MergeSummary | null>(null);
+  const [backupMeta, setBackupMeta] = useState(loadBackupMeta());
+
+  function handleExport() {
+    const timestamp = new Date().toISOString();
+    downloadJson(
+      `vet-visits-backup-${timestamp.slice(0, 10)}.json`,
+      state,
+    );
+    const nextMeta = {
+      timestamp,
+      petsCount: state.pets.length,
+      visitsCount: state.visits.length,
+    };
+    saveBackupMeta(nextMeta);
+    setBackupMeta(nextMeta);
+  }
 
   async function handlePick(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -58,15 +74,7 @@ export function BackupTools({ state, onImport }: Props) {
       <h2>💾 Respaldo</h2>
 
       <div className="row">
-        <button
-          className="btn"
-          onClick={() =>
-            downloadJson(
-              `vet-visits-backup-${new Date().toISOString().slice(0, 10)}.json`,
-              state,
-            )
-          }
-        >
+        <button className="btn" onClick={handleExport}>
           Exportar JSON
         </button>
 
@@ -85,6 +93,18 @@ export function BackupTools({ state, onImport }: Props) {
           Recomendado: exporta 1 vez al mes o antes de cambiar de PC.
         </span>
       </div>
+
+      {backupMeta ? (
+        <div className="backup-preview" role="status" aria-live="polite">
+          <div className="strong">Ultimo respaldo</div>
+          <div className="muted small">
+            {new Date(backupMeta.timestamp).toLocaleString("es-CL")}
+          </div>
+          <div className="muted small">
+            Mascotas: {backupMeta.petsCount} · Visitas: {backupMeta.visitsCount}
+          </div>
+        </div>
+      ) : null}
 
       {pendingImport ? (
         <div className="backup-preview">

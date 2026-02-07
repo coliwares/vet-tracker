@@ -2,6 +2,13 @@ import type { AppState } from "./types";
 
 
 const STORAGE_KEY = "vet-visits-tracker:v1";
+const BACKUP_META_KEY = "vet-visits-tracker:last-backup";
+
+export type BackupMeta = {
+	timestamp: string;
+	petsCount: number;
+	visitsCount: number;
+};
 
 
 export const emptyState: AppState = {
@@ -33,6 +40,26 @@ return emptyState;
 
 export function saveState(state: AppState) {
 localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+export function saveBackupMeta(meta: BackupMeta) {
+try {
+localStorage.setItem(BACKUP_META_KEY, JSON.stringify(meta));
+} catch {
+// ignore storage errors
+}
+}
+
+export function loadBackupMeta(): BackupMeta | null {
+try {
+const raw = localStorage.getItem(BACKUP_META_KEY);
+if (!raw) return null;
+const parsed = JSON.parse(raw) as BackupMeta;
+if (!parsed || !parsed.timestamp) return null;
+return parsed;
+} catch {
+return null;
+}
 }
 
 
