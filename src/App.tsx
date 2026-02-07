@@ -225,6 +225,7 @@ export default function App() {
                 </button>
               ))}
             </div>
+            <div className="muted small">Afecta todas las metricas del panel.</div>
           </div>
 
           <header className="header">

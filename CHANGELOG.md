@@ -24,6 +24,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added a clear button for the visit history search input.
 - Improved dashboard and history empty-state guidance with clearer CTAs.
 - Added a lightweight bar visualization for the Gasto por mascota section.
+- Added microcopy clarifying the dashboard range filter affects all metrics.
 
 ## [1.0.0] - 2026-02-06
 ### Added
