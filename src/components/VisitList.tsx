@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Pet, VetVisit } from "../types";
 import { formatCLP } from "../utils/currency";
 import { formatIsoToDisplay } from "../utils/date";
@@ -7,6 +7,7 @@ import {
   type SortKey,
 } from "../utils/visitFilters";
 import type { VisitRange } from "../utils/visits";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 type Props = {
   pets: Pet[];
@@ -40,6 +41,7 @@ export function VisitList({
   onNewVisit,
 }: Props) {
   const petById = useMemo(() => new Map(pets.map((p) => [p.id, p])), [pets]);
+  const [pendingDelete, setPendingDelete] = useState<VetVisit | null>(null);
 
   const filtered = useMemo(
     () =>
@@ -227,7 +229,7 @@ export function VisitList({
               </details>
 
               <div className="visit-actions">
-                <button className="btn danger" onClick={() => onDelete(v.id)}>
+                <button className="btn danger" onClick={() => setPendingDelete(v)}>
                   Eliminar
                 </button>
               </div>
@@ -235,6 +237,25 @@ export function VisitList({
           ))}
         </div>
       )}
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title={
+          pendingDelete
+            ? `Eliminar visita de ${petById.get(pendingDelete.petId)?.name ?? "Mascota"}`
+            : "Eliminar visita"
+        }
+        description={
+          pendingDelete
+            ? `Fecha ${formatIsoToDisplay(pendingDelete.date)}. Esta accion no se puede deshacer.`
+            : "Esta accion no se puede deshacer."
+        }
+        confirmText="Eliminar"
+        onConfirm={() => {
+          if (pendingDelete) onDelete(pendingDelete.id);
+          setPendingDelete(null);
+        }}
+        onCancel={() => setPendingDelete(null)}
+      />
     </section>
   );
 }

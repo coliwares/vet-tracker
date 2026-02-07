@@ -20,6 +20,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added mascota edit flow via modal dialog with full field updates.
 - Kept the CLP cost field empty by default and only formatted on user input.
 - Made clinic, vet, and notes fields rely on visible labels (with helper text) instead of placeholder-only context.
+- Added confirmation before deleting a visit while keeping the undo toast flow.
 
 ## [1.0.0] - 2026-02-06
 ### Added
