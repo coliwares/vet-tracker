@@ -283,7 +283,6 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
               onChange={(e) => handleCostChange(e.target.value)}
               onBlur={() => setCostTouched(true)}
               className={costTouched ? (costValid ? "success" : "error") : ""}
-              placeholder="$25.000"
               inputMode="numeric"
             />
             {costTouched && !costValid ? (
