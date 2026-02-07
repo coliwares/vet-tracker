@@ -151,6 +151,16 @@ export function VisitList({
           />
         </label>
 
+        <button
+          className="btn secondary"
+          type="button"
+          onClick={() => onChangeSearch("")}
+          disabled={search.trim() === ""}
+          aria-label="Limpiar busqueda"
+        >
+          Limpiar busqueda
+        </button>
+
         {onNewVisit ? (
           <button className="btn secondary" type="button" onClick={onNewVisit}>
             Nueva visita
