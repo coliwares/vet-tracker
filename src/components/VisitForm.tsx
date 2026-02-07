@@ -9,14 +9,14 @@ import {
 } from "../utils/date";
 
 type Props = {
-  pets: Pet[];
-  defaultPetId?: string;
-  onAdd: (visit: VetVisit) => void;
+  readonly pets: Pet[];
+  readonly defaultPetId?: string;
+  readonly onAdd: (visit: VetVisit) => void;
 };
 
-export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
+export function VisitForm({ pets, defaultPetId, onAdd }: Readonly<Props>) {
   const todayIso = new Date().toISOString().slice(0, 10);
-  const toastTimerRef = useRef<number | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [petId, setPetId] = useState(defaultPetId ?? pets[0]?.id ?? "");
   const [date, setDate] = useState(todayIso);
@@ -60,10 +60,9 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
     () => pets.length > 0 && petValid && reasonValid && dateValid && costValid,
     [pets.length, petValid, reasonValid, dateValid, costValid],
   );
-
   useEffect(() => {
     return () => {
-      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+      if (toastTimerRef.current) globalThis.clearTimeout(toastTimerRef.current);
     };
   }, []);
 
@@ -114,14 +113,14 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
 
   function showToast(message: string) {
     setToast(message);
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => {
+    if (toastTimerRef.current) globalThis.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = globalThis.setTimeout(() => {
       setToast(null);
     }, 3200);
   }
 
   function handleCostChange(value: string) {
-    const digits = value.replace(/[^0-9]/g, "");
+    const digits = value.replaceAll(/\D/g, "");
     if (!digits) {
       setCostInput("");
       return;
@@ -130,7 +129,7 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
     setCostInput(Number.isNaN(numeric) ? "" : formatCLP(numeric));
   }
 
-  function submit(e: React.FormEvent) {
+  function submit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!canAdd) {
       setPetTouched(true);
@@ -332,7 +331,6 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
                 <input
                   value={clinic}
                   onChange={(e) => setClinic(e.target.value)}
-                  placeholder="Ej: Vet Los Dominicos"
                 />
                 <span className="field-helper">
                   Opcional: agrega el nombre de la clínica.
@@ -344,7 +342,6 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
                 <input
                   value={vet}
                   onChange={(e) => setVet(e.target.value)}
-                  placeholder="Nombre"
                 />
                 <span className="field-helper">
                   Opcional: nombre de la persona que atendió.
@@ -356,7 +353,6 @@ export function VisitForm({ pets, defaultPetId, onAdd }: Props) {
                 <input
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Observaciones, exámenes, etc."
                 />
                 <span className="field-helper">
                   Opcional: detalles extra o recomendaciones.
