@@ -21,7 +21,7 @@ export function BackupTools({ state, onImport }: Props) {
   function handleExport() {
     const timestamp = new Date().toISOString();
     downloadJson(
-      `vet-visits-backup-${timestamp.slice(0, 10)}.json`,
+      `respaldo-visitas-veterinarias-${timestamp.slice(0, 10)}.json`,
       state,
     );
     const nextMeta = {

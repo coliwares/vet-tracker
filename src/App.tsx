@@ -169,7 +169,7 @@ export default function App() {
             🐾
           </div>
           <div>
-            <div className="brand-title">Vet Visits Tracker</div>
+            <div className="brand-title">Registro de visitas veterinarias</div>
             <div className="muted small">
               Registro simple de visitas al veterinario (offline).
             </div>
@@ -179,7 +179,7 @@ export default function App() {
         <nav className="nav" aria-label="Secciones principales">
           {(
             [
-              { id: "dashboard", label: "Dashboard" },
+              { id: "dashboard", label: "Panel" },
               { id: "visits", label: "Visitas" },
               { id: "pets", label: "Mascotas" },
               { id: "settings", label: "Ajustes" },
@@ -232,7 +232,7 @@ export default function App() {
 
           <header className="header">
             <div>
-              <h1>🐾 Vet Visits Tracker</h1>
+              <h1>🐾 Registro de visitas veterinarias</h1>
               <p className="muted">
                 Registro simple de visitas al veterinario para tus mascotas
                 (offline).
@@ -483,8 +483,8 @@ export default function App() {
       ) : null}
 
       <footer className="footer muted small">
-        Hecho para registrar visitas vet. Persistencia: LocalStorage. Exporta
-        backups si lo necesitas.
+        Hecho para registrar visitas veterinarias. Persistencia: almacenamiento
+        local (LocalStorage). Exporta respaldos si lo necesitas.
       </footer>
       {undoVisit ? (
         <div className="undo-toast" role="status" aria-live="polite">

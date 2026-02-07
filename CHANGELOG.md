@@ -28,6 +28,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added last backup metadata (date/time and counts) to the Respaldo section.
 - Expanded JSON import preview with current counts and merge impact details.
 - Improved keyboard accessibility for chips, filters, and option menus with ARIA roles.
+- Translated remaining visible UI text to Spanish, including branding, navigation, footer, and page metadata.
 
 ## [1.0.0] - 2026-02-06
 ### Added

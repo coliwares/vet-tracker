@@ -265,7 +265,7 @@ export function PetForm({ pets, onAdd, onUpdate, onDelete, onViewVisits }: Props
             + Agregar mascota
           </button>
           <span className="muted small">
-            Tip: puedes cargar varias y luego filtrar visitas.
+            Consejo: puedes cargar varias y luego filtrar visitas.
           </span>
         </div>
       </form>
