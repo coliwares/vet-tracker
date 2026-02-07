@@ -49,6 +49,18 @@ export default function App() {
     nextAppointment,
   } = dashboardStats;
 
+  const spendRows = useMemo(() => {
+    const rows = state.pets
+      .map((pet) => ({
+        pet,
+        amount: totalsByPet.get(pet.id) ?? 0,
+      }))
+      .filter((row) => row.amount > 0)
+      .sort((a, b) => b.amount - a.amount);
+    const max = rows.reduce((acc, row) => Math.max(acc, row.amount), 0);
+    return { rows, max };
+  }, [state.pets, totalsByPet]);
+
   function addPet(pet: Pet) {
     setState((s) => ({ ...s, pets: [pet, ...s.pets] }));
     // si es la primera, la dejamos como filtro por defecto (opcional)
@@ -296,22 +308,35 @@ export default function App() {
           {filteredVisits.length > 0 ? (
             <section className="card">
               <h2>📊 Gasto por mascota</h2>
-              <div className="chips">
-                {state.pets.map((p) => {
-                  const amount = totalsByPet.get(p.id);
-                  if (amount === undefined) return null;
-                  return (
-                    <div key={p.id} className="chip">
+              <div className="spend-list" role="list">
+                {spendRows.rows.map((row) => (
+                  <div key={row.pet.id} className="spend-row" role="listitem">
+                    <div className="spend-meta">
                       <span className="chip-icon" aria-hidden="true">
-                        {p.name.slice(0, 1).toUpperCase()}
+                        {row.pet.name.slice(0, 1).toUpperCase()}
                       </span>
-                      <span className="strong">{p.name}</span>
-                      <span className="chip-amount">
-                        {formatCLP(amount ?? 0)}
-                      </span>
+                      <div>
+                        <div className="strong">{row.pet.name}</div>
+                        <div className="muted small">
+                          {row.pet.petType ?? "Mascota"}
+                        </div>
+                      </div>
                     </div>
-                  );
-                })}
+                    <div className="spend-bar" aria-hidden="true">
+                      <div
+                        className="spend-fill"
+                        style={{
+                          width: spendRows.max
+                            ? `${Math.round((row.amount / spendRows.max) * 100)}%`
+                            : "0%",
+                        }}
+                      />
+                    </div>
+                    <div className="spend-amount">
+                      {formatCLP(row.amount)}
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           ) : (
