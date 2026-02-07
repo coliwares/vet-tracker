@@ -14,6 +14,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Updated perritas form tab order to follow Nombre → Raza → Fecha → Notas for keyboard navigation.
 - Localized date inputs to dd/mm/yyyy with month/year selectors for faster navigation while keeping stored ISO dates.
 - Added native date picker triggers for birth date and visit date fields while keeping dd/mm/yyyy inputs.
+- Removed month/year dropdowns from date inputs and kept the picker button inline with the date field.
 
 ## [1.0.0] - 2026-02-06
 ### Added
