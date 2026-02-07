@@ -26,6 +26,7 @@ This project follows Semantic Versioning (SemVer) using the format MAJOR.MINOR.P
 - Added a lightweight bar visualization for the Gasto por mascota section.
 - Added microcopy clarifying the dashboard range filter affects all metrics.
 - Added last backup metadata (date/time and counts) to the Respaldo section.
+- Expanded JSON import preview with current counts and merge impact details.
 
 ## [1.0.0] - 2026-02-06
 ### Added

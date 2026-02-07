@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import type { AppState } from "../types";
 import { downloadJson, loadBackupMeta, readJsonFile, saveBackupMeta } from "../storage";
 import { mergeData, type MergeSummary } from "../utils/backupMerge";
@@ -13,6 +13,10 @@ export function BackupTools({ state, onImport }: Props) {
   const [pendingImport, setPendingImport] = useState<AppState | null>(null);
   const [mergeSummary, setMergeSummary] = useState<MergeSummary | null>(null);
   const [backupMeta, setBackupMeta] = useState(loadBackupMeta());
+  const mergePreview = useMemo(
+    () => (pendingImport ? mergeData(state, pendingImport, "merge").summary : null),
+    [pendingImport, state],
+  );
 
   function handleExport() {
     const timestamp = new Date().toISOString();
@@ -112,6 +116,20 @@ export function BackupTools({ state, onImport }: Props) {
             Vas a importar {pendingImport.visits.length} visitas y {" "}
             {pendingImport.pets.length} mascotas.
           </div>
+          <div className="muted small">
+            Actual: {state.pets.length} mascotas · {state.visits.length} visitas.
+          </div>
+          <div className="muted small">
+            Importar: {pendingImport.pets.length} mascotas · {pendingImport.visits.length} visitas.
+          </div>
+          {mergePreview ? (
+            <div className="muted small">
+              Al combinar: {mergePreview.pets.kept} mascotas
+              {mergePreview.pets.discarded ? ` (descarta ${mergePreview.pets.discarded})` : ""}
+              · {mergePreview.visits.kept} visitas
+              {mergePreview.visits.discarded ? ` (descarta ${mergePreview.visits.discarded})` : ""}.
+            </div>
+          ) : null}
           <div className="muted small">
             Puedes reemplazar todo o combinar (deduplicar) usando las claves
             sugeridas.
